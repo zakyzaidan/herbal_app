@@ -36,3 +36,17 @@ class AuthRegistrationOTPSent extends AuthState {
   @override
   List<Object?> get props => [email, password];
 }
+
+class SellerProfileLoading extends AuthState {}
+
+class SellerProfileSuccess extends AuthState {
+  final SellerProfile profile;
+
+  SellerProfileSuccess(this.profile);
+}
+
+class SellerProfileError extends AuthState {
+  final String message;
+
+  SellerProfileError(this.message);
+}

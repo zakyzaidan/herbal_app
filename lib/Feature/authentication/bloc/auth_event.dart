@@ -50,3 +50,12 @@ class AuthSendRegistrationOTPRequested extends AuthEvent {
 }
 
 class AuthGoogleSignInRequested extends AuthEvent {}
+
+class CreateSellerProfileEvent extends AuthEvent {
+  final Map<String, dynamic> data;
+  final String userId;
+
+  CreateSellerProfileEvent({required this.data, required this.userId});
+}
+
+

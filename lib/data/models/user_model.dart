@@ -27,9 +27,23 @@ class UserModel {
   /// Semua role milik user
   final List<UserRole> roles;
 
+  /// Mendapatkan role yang aktif
+  UserRole? get activeRole {
+    try {
+      return roles.firstWhere((r) => r.isActive);
+    } catch (e) {
+      return null;
+    }
+  }
+
   /// Helper untuk cek role
   bool hasRole(String roleName) {
     return roles.any((r) => r.roleName.toLowerCase() == roleName.toLowerCase());
+  }
+
+  /// Cek apakah role tertentu sedang aktif
+  bool isRoleActive(String roleName) {
+    return activeRole?.roleName.toLowerCase() == roleName.toLowerCase();
   }
 
   UserModel({

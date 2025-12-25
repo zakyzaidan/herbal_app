@@ -10,7 +10,7 @@ class SellerServices {
   final String _productTableName = 'products';
   final SupabaseStorageService _storageService = SupabaseStorageService();
 
-  // --- 1. Mengambil Data Profil UMKM berdasarkan User ID ---
+  // --- 1. Mengambil Data Profil Seller berdasarkan User ID ---
   Future<SellerProfile?> getProfileByUserId(String userId) async {
     try {
       final response = await supabase
@@ -36,16 +36,16 @@ class SellerServices {
   }
 
   // --- 2. Menyimpan/Membuat Profil UMKM Baru ---
-  Future<SellerProfile> createProfile(SellerProfile profile) async {
+  Future<SellerProfile> createProfile(Map<String, dynamic> data, String userId) async {
     try {
       // Pastikan 'user_id' sudah diisi di objek 'profile' sebelum memanggil service
-      final List<Map<String, dynamic>> response = await supabase
+      final PostgrestMap response = await supabase
           .from(_sellerTableName)
-          .insert(profile.toJson())
-          .select(); // Mengembalikan data yang baru saja di-insert
+          .insert({...data, 'user_id': userId})
+          .select().single(); // Mengembalikan data yang baru saja di-insert
 
       // Supabase insert mengembalikan list of maps, ambil item pertama
-      return SellerProfile.fromJson(response.first);
+      return SellerProfile.fromJson(response);
     } catch (e) {
       throw Exception('Gagal membuat profil baru: $e');
     }

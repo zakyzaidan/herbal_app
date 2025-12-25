@@ -1,6 +1,8 @@
 import 'package:bloc/bloc.dart';
+import 'package:herbal_app/data/models/seller_model.dart';
 import 'package:herbal_app/data/models/user_model.dart';
 import 'package:herbal_app/data/services/auth_services.dart';
+import 'package:herbal_app/data/services/seller_services.dart';
 import 'package:meta/meta.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -9,6 +11,7 @@ part 'auth_state.dart';
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final AuthServices _authRepository = AuthServices();
+  final SellerServices sellerServices = SellerServices();
 
   AuthBloc() : super(AuthInitial()) {
     on<AuthCheckRequested>(_onAuthCheckRequested);
@@ -20,6 +23,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     );
     on<AuthSendRegistrationOTPRequested>(_onAuthSendRegistrationOTPRequested);
     on<AuthGoogleSignInRequested>(_onAuthGoogleSignInRequested);
+    on<CreateSellerProfileEvent>(_onCreateSellerProfile);
   }
 
   void _onAuthCheckRequested(
@@ -133,6 +137,29 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       emit(AuthError('Terjadi kesalahan: $e'));
     }
   }
+
+  Future<void> _onCreateSellerProfile(
+    CreateSellerProfileEvent event,
+    Emitter<AuthState> emit,
+  ) async {
+    emit(SellerProfileLoading());
+    try {
+      final profile = await sellerServices.createProfile(event.data, event.userId);
+      final activeRole = await _authRepository.getActiveRole();
+      print('Role saat ini: ${activeRole?.roleName}');
+      
+      // Assign role penjual (user sekarang punya 2 role)
+      bool success = await _authRepository.assignRole('penjual', setActive: true);
+      if (success) {
+        print('Berhasil upgrade ke penjual!');
+      }
+      emit(SellerProfileSuccess(profile));
+    } catch (e) {
+      emit(SellerProfileError(e.toString()));
+    }
+  }
+
+
 
   // void _onAuthCheckRequested(
   //   AuthCheckRequested event,

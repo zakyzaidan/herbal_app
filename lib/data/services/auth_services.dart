@@ -146,4 +146,119 @@ class AuthServices {
 
     return await _buildUserModel(response.user!.id);
   }
+
+  // ═════════════════════════════════════════════════════════════════════════
+  // ROLE MANAGEMENT
+  // ═════════════════════════════════════════════════════════════════════════
+
+  /// Mendapatkan role yang sedang aktif
+  Future<UserRole?> getActiveRole() async {
+    final user = await getCurrentUser();
+    return user?.activeRole;
+  }
+
+  /// Switch role berdasarkan nama
+  Future<bool> switchRole(String roleName) async {
+    final userId = supabase.auth.currentUser?.id;
+    if (userId == null) return false;
+
+    try {
+      // Cari role_id berdasarkan nama
+      final role = await supabase
+          .from('roles')
+          .select('id')
+          .ilike('name', roleName)
+          .single();
+
+      // Cek apakah user punya role ini
+      final userRole = await supabase
+          .from('user_roles')
+          .select('id')
+          .eq('user_id', userId)
+          .eq('role_id', role['id'])
+          .maybeSingle();
+
+      if (userRole == null) {
+        print('User tidak memiliki role $roleName');
+        return false;
+      }
+
+      // Nonaktifkan semua role, aktifkan yang dipilih
+      await supabase
+          .from('user_roles')
+          .update({'is_active': false})
+          .eq('user_id', userId);
+
+      await supabase
+          .from('user_roles')
+          .update({'is_active': true})
+          .eq('user_id', userId)
+          .eq('role_id', role['id']);
+
+      return true;
+    } catch (e) {
+      print('Error switching role: $e');
+      return false;
+    }
+  }
+
+  /// Assign role baru ke user (untuk upgrade role)
+  Future<bool> assignRole(String roleName, {bool setActive = false}) async {
+    final userId = supabase.auth.currentUser?.id;
+    if (userId == null) return false;
+
+    try {
+      // Cari role_id
+      final role = await supabase
+          .from('roles')
+          .select('id')
+          .ilike('name', roleName)
+          .single();
+
+      // Cek apakah sudah punya role ini
+      final existing = await supabase
+          .from('user_roles')
+          .select('id')
+          .eq('user_id', userId)
+          .eq('role_id', role['id'])
+          .maybeSingle();
+
+      if (existing != null) {
+        print('User sudah memiliki role $roleName');
+        return false;
+      }
+
+      // Jika set active, nonaktifkan yang lain
+      if (setActive) {
+        await supabase
+            .from('user_roles')
+            .update({'is_active': false})
+            .eq('user_id', userId);
+      }
+
+      // Tambahkan role baru
+      await supabase.from('user_roles').insert({
+        'user_id': userId,
+        'role_id': role['id'],
+        'is_active': setActive,
+      });
+
+      return true;
+    } catch (e) {
+      print('Error assigning role: $e');
+      return false;
+    }
+  }
+
+  /// Stream untuk listen perubahan role
+  Stream<UserModel?> watchRoles() {
+    final userId = supabase.auth.currentUser?.id;
+    if (userId == null) return Stream.value(null);
+
+    return supabase
+        .from('user_roles')
+        .stream(primaryKey: ['id'])
+        .eq('user_id', userId)
+        .asyncMap((_) => _buildUserModel(userId));
+  }
 }

@@ -1,4 +1,3 @@
-// umkm_profile.dart
 
 class SellerProfile {
   // Field-field yang wajib ada
@@ -57,8 +56,7 @@ class SellerProfile {
       socialMediaUrl: json['social_media_url'] as String?,
       whatsappNumber: json['whatsapp_number'] as String?,
       productsServices: products,
-      // Supabase biasanya mengembalikan timestampz sebagai string,
-      // DateTime.parse() akan mengonversinya.
+
       createdAt: DateTime.parse(json['created_at'] as String),
       updatedAt: DateTime.parse(json['updated_at'] as String),
       businessLogo: json['business_logo'] as String?,
@@ -68,9 +66,6 @@ class SellerProfile {
   // Metode untuk mengonversi objek menjadi Map (untuk dikirim ke Supabase)
   Map<String, dynamic> toJson() {
     return {
-      // id, user_id, created_at, dan updated_at biasanya dikelola oleh database/system
-      // dan tidak perlu dikirim saat INSERT/UPDATE kecuali ada kasus khusus.
-      // Kita hanya menyertakan field yang perlu diubah/input.
       'business_name': businessName,
       'business_category': businessCategory,
       'established_year': establishedYear,

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:herbal_app/Feature/authentication/bloc/auth_bloc.dart';
+import 'package:herbal_app/Feature/settings/ui/settings_view.dart';
 import 'package:herbal_app/data/models/user_model.dart';
 
 class ProfilView extends StatelessWidget {
@@ -18,9 +19,9 @@ class ProfilView extends StatelessWidget {
             title: const Text('Home'),
             actions: [
               IconButton(
-                icon: const Icon(Icons.logout),
+                icon: const Icon(Icons.settings),
                 onPressed: () {
-                  context.read<AuthBloc>().add(AuthLogoutRequested());
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => const SettingsView()));
                 },
               ),
             ],
