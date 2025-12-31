@@ -1,3 +1,4 @@
+// lib/Feature/settings/bloc/settings_state.dart
 part of 'settings_bloc.dart';
 
 @immutable
@@ -5,18 +6,24 @@ sealed class SettingsState {}
 
 final class SettingsInitial extends SettingsState {}
 
-class SellerProfileInitial extends SettingsState {}
+final class SettingsLoading extends SettingsState {}
 
-class SellerProfileLoading extends SettingsState {}
-
-class SellerProfileSuccess extends SettingsState {
-  final SellerProfile profile;
-
-  SellerProfileSuccess(this.profile);
-}
-
-class SellerProfileError extends SettingsState {
+final class SettingsError extends SettingsState {
   final String message;
 
-  SellerProfileError(this.message);
+  SettingsError(this.message);
 }
+
+final class RoleSwitchSuccess extends SettingsState {
+  final String roleName;
+
+  RoleSwitchSuccess(this.roleName);
+}
+
+final class SellerProfileCreated extends SettingsState {
+  final SellerProfile profile;
+
+  SellerProfileCreated(this.profile);
+}
+
+final class PractitionerProfileCreated extends SettingsState {}

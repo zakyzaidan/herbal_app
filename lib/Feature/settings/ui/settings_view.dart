@@ -1,8 +1,11 @@
+// lib/Feature/settings/ui/settings_view.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:herbal_app/Feature/authentication/bloc/auth_bloc.dart';
+import 'package:herbal_app/Feature/authentication/ui/login_view.dart';
 import 'package:herbal_app/Feature/settings/bloc/settings_bloc.dart';
 import 'package:herbal_app/Feature/authentication/ui/form_create_seller.dart';
+import 'package:herbal_app/data/models/user_model.dart';
 
 // Models
 class SettingsMenuItem {
@@ -217,27 +220,22 @@ class _SettingsViewState extends State<SettingsView> {
     );
   }
 
-  
-
   Widget _buildVersionInfo() {
     return const Center(
       child: Padding(
         padding: EdgeInsets.all(16.0),
         child: Text(
           'Versi Aplikasi 1.0',
-          style: TextStyle(
-            color: Colors.grey,
-            fontSize: 14,
-          ),
+          style: TextStyle(color: Colors.grey, fontSize: 14),
         ),
       ),
     );
   }
 
   void _navigateToPage(String pageName) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Navigasi ke: $pageName')),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text('Navigasi ke: $pageName')));
   }
 
   void _showLogoutDialog() {
@@ -253,73 +251,222 @@ class _SettingsViewState extends State<SettingsView> {
           ),
           TextButton(
             onPressed: () {
-              Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Berhasil keluar')),
+              context.read<AuthBloc>().add(AuthLogoutRequested());
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(const SnackBar(content: Text('Berhasil keluar')));
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) {
+                    return const LoginPage();
+                  },
+                ),
               );
             },
-            child: const Text(
-              'Keluar',
-              style: TextStyle(color: Colors.red),
-            ),
+            child: const Text('Keluar', style: TextStyle(color: Colors.red)),
           ),
         ],
       ),
     );
   }
+
   void _showRoleBottomSheet() {
+    // Ambil AuthBloc dari context saat ini
+    final authBloc = context.read<AuthBloc>();
+
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.white,
+      isScrollControlled: true,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      builder: (context) => const RoleSelectionBottomSheet(),
+      builder: (bottomSheetContext) => BlocProvider(
+        create: (context) => SettingsBloc(),
+        child: RoleSelectionBottomSheet(authBloc: authBloc),
+      ),
     );
   }
 }
 
 class RoleSelectionBottomSheet extends StatelessWidget {
-  const RoleSelectionBottomSheet({Key? key}) : super(key: key);
+  final AuthBloc authBloc;
+
+  const RoleSelectionBottomSheet({Key? key, required this.authBloc})
+    : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(24),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            width: 40,
-            height: 4,
-            decoration: BoxDecoration(
-              color: Colors.green[700],
-              borderRadius: BorderRadius.circular(2),
+    return BlocConsumer<SettingsBloc, SettingsState>(
+      listener: (context, state) {
+        if (state is RoleSwitchSuccess) {
+          Navigator.pop(context);
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Berhasil switch ke role ${state.roleName}'),
+              backgroundColor: Colors.green,
             ),
-          ),
-          const SizedBox(height: 24),
+          );
+          // Refresh auth state
+          authBloc.add(AuthCheckRequested());
+        } else if (state is SellerProfileCreated) {
+          Navigator.pop(context);
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Berhasil membuat akun penjual!'),
+              backgroundColor: Colors.green,
+            ),
+          );
+          // Refresh auth state
+          authBloc.add(AuthCheckRequested());
+        } else if (state is PractitionerProfileCreated) {
+          Navigator.pop(context);
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Berhasil membuat akun praktisi!'),
+              backgroundColor: Colors.green,
+            ),
+          );
+          // Refresh auth state
+          authBloc.add(AuthCheckRequested());
+        } else if (state is SettingsError) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(state.message), backgroundColor: Colors.red),
+          );
+        }
+      },
+      builder: (context, settingsState) {
+        return BlocBuilder<AuthBloc, AuthState>(
+          bloc: authBloc,
+          builder: (context, authState) {
+            if (authState is! AuthAuthenticated) {
+              return const SizedBox();
+            }
+
+            final user = authState.user;
+            final activeRole = user.activeRole;
+            final isLoading = settingsState is SettingsLoading;
+
+            return Container(
+              padding: const EdgeInsets.all(24),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Handle indicator
+                  Container(
+                    width: 40,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: Colors.green[700],
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+
+                  // Title
+                  Text(
+                    'Kelola Role Akun',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.green[700],
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Role aktif: ${activeRole?.roleName ?? "Tidak ada"}',
+                    style: const TextStyle(fontSize: 14, color: Colors.grey),
+                  ),
+                  const SizedBox(height: 24),
+
+                  // Loading indicator
+                  if (isLoading)
+                    const Padding(
+                      padding: EdgeInsets.all(20),
+                      child: CircularProgressIndicator(),
+                    ),
+
+                  // Role options based on active role
+                  if (!isLoading) ..._buildRoleOptions(context, user),
+
+                  const SizedBox(height: 24),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  List<Widget> _buildRoleOptions(BuildContext context, UserModel user) {
+    final activeRole = user.activeRole;
+    final hasPenjualRole = user.hasRole('penjual');
+    final hasPraktisiRole = user.hasRole('praktisi');
+
+    List<Widget> options = [];
+
+    // Jika role pengguna biasa aktif
+    if (activeRole?.roleName.toLowerCase() == 'pengguna') {
+      // Option untuk buat/switch ke penjual
+      if (hasPenjualRole) {
+        options.add(
           _buildRoleOption(
             context,
             icon: Icons.storefront,
-            title: 'Akun Penjual',
+            title: 'Switch ke Akun Penjual',
+            subtitle: 'Beralih ke mode penjual',
+            onTap: () {
+              context.read<SettingsBloc>().add(SwitchRoleEvent('penjual'));
+            },
+          ),
+        );
+      } else {
+        options.add(
+          _buildRoleOption(
+            context,
+            icon: Icons.storefront,
+            title: 'Buat Akun Penjual',
+            subtitle: 'Daftar sebagai penjual produk herbal',
             onTap: () {
               Navigator.pop(context);
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => BlocProvider<AuthBloc>(
-                    create: (context) => AuthBloc(),
+                  builder: (context) => BlocProvider.value(
+                    value: authBloc,
                     child: const SellerProfileFormScreen(),
                   ),
                 ),
               );
             },
           ),
-          const SizedBox(height: 12),
+        );
+      }
+
+      options.add(const SizedBox(height: 12));
+
+      // Option untuk buat/switch ke praktisi
+      if (hasPraktisiRole) {
+        options.add(
           _buildRoleOption(
             context,
             icon: Icons.local_florist,
-            title: 'Akun Praktisi Herbal',
+            title: 'Switch ke Akun Praktisi',
+            subtitle: 'Beralih ke mode praktisi herbal',
+            onTap: () {
+              context.read<SettingsBloc>().add(SwitchRoleEvent('praktisi'));
+            },
+          ),
+        );
+      } else {
+        options.add(
+          _buildRoleOption(
+            context,
+            icon: Icons.local_florist,
+            title: 'Buat Akun Praktisi Herbal',
+            subtitle: 'Daftar sebagai praktisi herbal',
             onTap: () {
               Navigator.pop(context);
               ScaffoldMessenger.of(context).showSnackBar(
@@ -329,16 +476,120 @@ class RoleSelectionBottomSheet extends StatelessWidget {
               );
             },
           ),
-          const SizedBox(height: 24),
-        ],
-      ),
-    );
+        );
+      }
+    }
+    // Jika role penjual aktif
+    else if (activeRole?.roleName.toLowerCase() == 'penjual') {
+      // Switch ke pengguna biasa
+      options.add(
+        _buildRoleOption(
+          context,
+          icon: Icons.person,
+          title: 'Switch ke Pengguna Biasa',
+          subtitle: 'Kembali ke mode pengguna',
+          onTap: () {
+            context.read<SettingsBloc>().add(SwitchRoleEvent('pengguna'));
+          },
+        ),
+      );
+
+      options.add(const SizedBox(height: 12));
+
+      // Option untuk praktisi
+      if (hasPraktisiRole) {
+        options.add(
+          _buildRoleOption(
+            context,
+            icon: Icons.local_florist,
+            title: 'Switch ke Akun Praktisi',
+            subtitle: 'Beralih ke mode praktisi herbal',
+            onTap: () {
+              context.read<SettingsBloc>().add(SwitchRoleEvent('praktisi'));
+            },
+          ),
+        );
+      } else {
+        options.add(
+          _buildRoleOption(
+            context,
+            icon: Icons.local_florist,
+            title: 'Buat Akun Praktisi Herbal',
+            subtitle: 'Daftar sebagai praktisi herbal',
+            onTap: () {
+              Navigator.pop(context);
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Form Akun Praktisi Herbal (Coming Soon)'),
+                ),
+              );
+            },
+          ),
+        );
+      }
+    }
+    // Jika role praktisi aktif
+    else if (activeRole?.roleName.toLowerCase() == 'praktisi') {
+      // Switch ke pengguna biasa
+      options.add(
+        _buildRoleOption(
+          context,
+          icon: Icons.person,
+          title: 'Switch ke Pengguna Biasa',
+          subtitle: 'Kembali ke mode pengguna',
+          onTap: () {
+            context.read<SettingsBloc>().add(SwitchRoleEvent('pengguna'));
+          },
+        ),
+      );
+
+      options.add(const SizedBox(height: 12));
+
+      // Option untuk penjual
+      if (hasPenjualRole) {
+        options.add(
+          _buildRoleOption(
+            context,
+            icon: Icons.storefront,
+            title: 'Switch ke Akun Penjual',
+            subtitle: 'Beralih ke mode penjual',
+            onTap: () {
+              context.read<SettingsBloc>().add(SwitchRoleEvent('penjual'));
+            },
+          ),
+        );
+      } else {
+        options.add(
+          _buildRoleOption(
+            context,
+            icon: Icons.storefront,
+            title: 'Buat Akun Penjual',
+            subtitle: 'Daftar sebagai penjual produk herbal',
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => BlocProvider.value(
+                    value: authBloc,
+                    child: const SellerProfileFormScreen(),
+                  ),
+                ),
+              );
+            },
+          ),
+        );
+      }
+    }
+
+    return options;
   }
 
   Widget _buildRoleOption(
     BuildContext context, {
     required IconData icon,
     required String title,
+    required String subtitle,
     required VoidCallback onTap,
   }) {
     return InkWell(
@@ -352,16 +603,33 @@ class RoleSelectionBottomSheet extends StatelessWidget {
         ),
         child: Row(
           children: [
-            Icon(icon, size: 28),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.green[50],
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Icon(icon, size: 28, color: Colors.green[700]),
+            ),
             const SizedBox(width: 16),
             Expanded(
-              child: Text(
-                title,
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.green,
-                ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.black87,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    subtitle,
+                    style: TextStyle(fontSize: 13, color: Colors.grey[600]),
+                  ),
+                ],
               ),
             ),
             Icon(Icons.chevron_right, color: Colors.grey[400]),

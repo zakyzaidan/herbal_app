@@ -31,10 +31,15 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     Emitter<AuthState> emit,
   ) async {
     final user = await _authRepository.getCurrentUser();
-
+    print(
+      'AuthCheckRequested: current user = $user' +
+          '========================================================',
+    );
     if (user != null) {
+      print(user.email);
       emit(AuthAuthenticated(user));
     } else {
+      print('========================================================');
       emit(AuthUnauthenticated());
     }
   }
@@ -144,12 +149,18 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   ) async {
     emit(SellerProfileLoading());
     try {
-      final profile = await sellerServices.createProfile(event.data, event.userId);
+      final profile = await sellerServices.createProfile(
+        event.data,
+        event.userId,
+      );
       final activeRole = await _authRepository.getActiveRole();
       print('Role saat ini: ${activeRole?.roleName}');
-      
+
       // Assign role penjual (user sekarang punya 2 role)
-      bool success = await _authRepository.assignRole('penjual', setActive: true);
+      bool success = await _authRepository.assignRole(
+        'penjual',
+        setActive: true,
+      );
       if (success) {
         print('Berhasil upgrade ke penjual!');
       }
@@ -158,8 +169,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       emit(SellerProfileError(e.toString()));
     }
   }
-
-
 
   // void _onAuthCheckRequested(
   //   AuthCheckRequested event,

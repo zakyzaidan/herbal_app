@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:herbal_app/Feature/authentication/bloc/auth_bloc.dart';
+import 'package:herbal_app/Feature/product/ui/form_create_product_view.dart';
 import 'package:herbal_app/main.dart';
-import 'package:herbal_app/main_navigation.dart';
-import 'package:supabase_flutter/supabase_flutter.dart' hide AuthState;
 
 class SellerProfileFormScreen extends StatefulWidget {
   const SellerProfileFormScreen({Key? key}) : super(key: key);
 
   @override
-  State<SellerProfileFormScreen> createState() => _SellerProfileFormScreenState();
+  State<SellerProfileFormScreen> createState() =>
+      _SellerProfileFormScreenState();
 }
 
 class _SellerProfileFormScreenState extends State<SellerProfileFormScreen> {
@@ -67,7 +67,7 @@ class _SellerProfileFormScreenState extends State<SellerProfileFormScreen> {
         builder: (context, state) {
           if (state is SellerProfileSuccess) {
             WidgetsBinding.instance.addPostFrameCallback((_) {
-              _showSuccessDialog(context);
+              _showSuccessDialog(context, state.profile.id);
             });
           }
 
@@ -253,16 +253,10 @@ class _SellerProfileFormScreenState extends State<SellerProfileFormScreen> {
           children: [
             Text(
               label,
-              style: const TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-              ),
+              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
             ),
             if (isRequired)
-              const Text(
-                ' *',
-                style: TextStyle(color: Colors.red),
-              ),
+              const Text(' *', style: TextStyle(color: Colors.red)),
           ],
         ),
         const SizedBox(height: 8),
@@ -313,29 +307,27 @@ class _SellerProfileFormScreenState extends State<SellerProfileFormScreen> {
 
       final data = {
         'business_name': _businessNameController.text,
-        'business_category': _categoryController.text.isEmpty 
-            ? null 
+        'business_category': _categoryController.text.isEmpty
+            ? null
             : _categoryController.text,
-        'established_year': _yearController.text.isEmpty 
-            ? null 
+        'established_year': _yearController.text.isEmpty
+            ? null
             : int.tryParse(_yearController.text),
-        'business_address': _addressController.text.isEmpty 
-            ? null 
+        'business_address': _addressController.text.isEmpty
+            ? null
             : _addressController.text,
-        'city': _cityController.text.isEmpty 
-            ? null 
-            : _cityController.text,
-        'province': _provinceController.text.isEmpty 
-            ? null 
+        'city': _cityController.text.isEmpty ? null : _cityController.text,
+        'province': _provinceController.text.isEmpty
+            ? null
             : _provinceController.text,
-        'description': _descriptionController.text.isEmpty 
-            ? null 
+        'description': _descriptionController.text.isEmpty
+            ? null
             : _descriptionController.text,
-        'social_media_url': _socialMediaController.text.isEmpty 
-            ? null 
+        'social_media_url': _socialMediaController.text.isEmpty
+            ? null
             : _socialMediaController.text,
-        'whatsapp_number': _whatsappController.text.isEmpty 
-            ? null 
+        'whatsapp_number': _whatsappController.text.isEmpty
+            ? null
             : _whatsappController.text,
         'products_services': products.isEmpty ? null : products,
       };
@@ -347,7 +339,7 @@ class _SellerProfileFormScreenState extends State<SellerProfileFormScreen> {
     }
   }
 
-  void _showSuccessDialog(BuildContext context) {
+  void _showSuccessDialog(BuildContext context, String sellerId) {
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -371,19 +363,13 @@ class _SellerProfileFormScreenState extends State<SellerProfileFormScreen> {
             const SizedBox(height: 24),
             const Text(
               'Berhasil!',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-              ),
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 12),
             const Text(
               'Akun penjual Anda berhasil didaftarkan',
               textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 16,
-                color: Colors.grey,
-              ),
+              style: TextStyle(fontSize: 16, color: Colors.grey),
             ),
             const SizedBox(height: 24),
             SizedBox(
@@ -391,10 +377,14 @@ class _SellerProfileFormScreenState extends State<SellerProfileFormScreen> {
               child: ElevatedButton(
                 onPressed: () {
                   Navigator.of(context).pop(); // Close dialog
-                  Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const MainNavigation()),
-            ); // Close form
+                  Navigator.of(context).pushReplacement(
+                    MaterialPageRoute(
+                      builder: (context) => ProductFormScreen(
+                        umkmId: sellerId,
+                        isFirstProduct: true,
+                      ),
+                    ),
+                  );
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.green[700],
@@ -404,7 +394,7 @@ class _SellerProfileFormScreenState extends State<SellerProfileFormScreen> {
                   padding: const EdgeInsets.symmetric(vertical: 14),
                 ),
                 child: const Text(
-                  'OK',
+                  'Tambah Produk',
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
@@ -413,6 +403,34 @@ class _SellerProfileFormScreenState extends State<SellerProfileFormScreen> {
                 ),
               ),
             ),
+            // const SizedBox(height: 24),
+            // SizedBox(
+            //   width: double.infinity,
+            //   child: ElevatedButton(
+            //     onPressed: () {
+            //       Navigator.of(context).pop(); // Close dialog
+            //       Navigator.push(
+            //   context,
+            //   MaterialPageRoute(builder: (context) => const MainNavigation()),
+            // ); // Close form
+            //     },
+            //     style: ElevatedButton.styleFrom(
+            //       backgroundColor: Colors.green[700],
+            //       shape: RoundedRectangleBorder(
+            //         borderRadius: BorderRadius.circular(12),
+            //       ),
+            //       padding: const EdgeInsets.symmetric(vertical: 14),
+            //     ),
+            //     child: const Text(
+            //       'OK',
+            //       style: TextStyle(
+            //         fontSize: 16,
+            //         fontWeight: FontWeight.bold,
+            //         color: Colors.white,
+            //       ),
+            //     ),
+            //   ),
+            // ),
           ],
         ),
       ),

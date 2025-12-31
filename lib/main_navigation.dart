@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:herbal_app/Feature/authentication/bloc/auth_bloc.dart';
 import 'package:herbal_app/Feature/authentication/ui/profil_view.dart';
 import 'package:herbal_app/Feature/forum/ui/forums_home_view.dart';
 import 'package:herbal_app/Feature/home/ui/home_screen.dart';
 import 'package:herbal_app/Feature/praktisi/ui/praktisi_view.dart';
 import 'package:herbal_app/Feature/product/ui/product_view.dart';
+import 'package:herbal_app/data/services/auth_services.dart';
 import 'package:stylish_bottom_bar/stylish_bottom_bar.dart';
 
 class MainNavigation extends StatefulWidget {
@@ -17,6 +20,23 @@ class MainNavigation extends StatefulWidget {
 class _MainNavigationState extends State<MainNavigation> {
   int selected = 0;
   final controller = PageController(initialPage: 0);
+  final authServices = AuthServices();
+
+  @override
+  void initState() {
+    super.initState();
+    _listenToRoleChanges();
+  }
+
+  void _listenToRoleChanges() {
+    // Listen to role changes and rebuild when role changes
+    authServices.watchRoles().listen((user) {
+      if (user != null && mounted) {
+        // Trigger rebuild by updating AuthBloc state
+        context.read<AuthBloc>().add(AuthCheckRequested());
+      }
+    });
+  }
 
   @override
   void dispose() {

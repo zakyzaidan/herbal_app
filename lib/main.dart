@@ -25,20 +25,19 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) => AuthBloc()..add(AuthCheckRequested()),
-      child: MaterialApp(
-        debugShowCheckedModeBanner: false,
-        title: 'Herbal App',
-        themeMode: ThemeMode.light,
-        darkTheme: AppTheme.dark,
-        theme: AppTheme.light,
-        home: BlocBuilder<AuthBloc, AuthState>(
-          builder: (context, state) {
-            if (state is AuthAuthenticated) {
-              return MainNavigation();
-            }
-            return const LoginPage();
-          },
-        ),
+      child: BlocBuilder<AuthBloc, AuthState>(
+        builder: (context, state) {
+          return MaterialApp(
+            debugShowCheckedModeBanner: false,
+            title: 'Herbal App',
+            themeMode: ThemeMode.light,
+            darkTheme: AppTheme.dark,
+            theme: AppTheme.light,
+            home: state is AuthAuthenticated
+                ? const MainNavigation()
+                : const LoginPage(),
+          );
+        },
       ),
     );
   }
