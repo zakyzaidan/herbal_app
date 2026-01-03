@@ -82,11 +82,8 @@ class _HomeScreenState extends State<HomeScreen> {
                       padding: EdgeInsets.only(left: 15),
                       separatorBuilder: (context, index) => SizedBox(width: 15),
                       itemBuilder: (context, index) {
-                        return ProdukCart(
-                          namaProduk: "namaProduk1",
-                          harga: "harga1",
-                          linkImageProduk: "linkImageProduk",
-                        );
+                        //tambah produk dari database disini menggunakan ProdukCart
+                        return SizedBox(height: 20);
                       },
                     ),
                   ),

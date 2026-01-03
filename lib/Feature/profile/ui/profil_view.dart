@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:herbal_app/Feature/authentication/bloc/auth_bloc.dart';
 import 'package:herbal_app/Feature/product/ui/form_create_product_view.dart';
 import 'package:herbal_app/Feature/settings/ui/settings_view.dart';
+import 'package:herbal_app/components/produk_cart.dart';
 import 'package:herbal_app/data/models/user_model.dart';
 import 'package:herbal_app/data/models/seller_model.dart';
 import 'package:herbal_app/data/services/seller_services.dart';
@@ -261,7 +262,7 @@ class _SellerProfileViewState extends State<SellerProfileView>
         child: Column(
           children: [
             _buildHeader(context),
-            const SizedBox(height: 20),
+            const SizedBox(height: 12),
             Expanded(
               child: Container(
                 decoration: const BoxDecoration(
@@ -276,7 +277,10 @@ class _SellerProfileViewState extends State<SellerProfileView>
                     : Column(
                         children: [
                           Padding(
-                            padding: const EdgeInsets.all(24),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 8,
+                            ),
                             child: _buildSellerCard(),
                           ),
                           _buildTabBar(),
@@ -318,7 +322,7 @@ class _SellerProfileViewState extends State<SellerProfileView>
 
   Widget _buildHeader(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(12),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -520,79 +524,8 @@ class _SellerProfileViewState extends State<SellerProfileView>
       itemCount: _products.length,
       itemBuilder: (context, index) {
         final product = _products[index];
-        return _buildProductCard(product);
+        return ProdukCart(product: product);
       },
-    );
-  }
-
-  Widget _buildProductCard(dynamic product) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.2),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.grey[200],
-                borderRadius: const BorderRadius.vertical(
-                  top: Radius.circular(12),
-                ),
-              ),
-              child: product.imageUrl != null && product.imageUrl!.isNotEmpty
-                  ? ClipRRect(
-                      borderRadius: const BorderRadius.vertical(
-                        top: Radius.circular(12),
-                      ),
-                      child: Image.network(
-                        product.imageUrl![0],
-                        width: double.infinity,
-                        fit: BoxFit.cover,
-                      ),
-                    )
-                  : const Center(
-                      child: Icon(Icons.image, size: 50, color: Colors.grey),
-                    ),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(12),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  product.namaProduk,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  'Rp ${product.harga}',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.green[700],
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
     );
   }
 

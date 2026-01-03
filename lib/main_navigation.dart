@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:herbal_app/Feature/authentication/bloc/auth_bloc.dart';
-import 'package:herbal_app/Feature/authentication/ui/profil_view.dart';
+import 'package:herbal_app/Feature/profile/ui/profil_view.dart';
 import 'package:herbal_app/Feature/forum/ui/forums_home_view.dart';
 import 'package:herbal_app/Feature/home/ui/home_screen.dart';
 import 'package:herbal_app/Feature/praktisi/ui/praktisi_view.dart';

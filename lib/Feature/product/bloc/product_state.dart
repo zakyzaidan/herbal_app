@@ -21,6 +21,12 @@ class ProductsLoaded extends ProductState {
   ProductsLoaded(this.products);
 }
 
+class ProductDetailLoaded extends ProductState {
+  final Product product;
+
+  ProductDetailLoaded(this.product);
+}
+
 class ProductUpdatedSuccess extends ProductState {
   final Product product;
 
@@ -28,7 +34,7 @@ class ProductUpdatedSuccess extends ProductState {
 }
 
 class ProductError extends ProductState {
-  late final String message;
+  final String message;
 
   ProductError(this.message);
 }

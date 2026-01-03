@@ -15,6 +15,12 @@ class LoadProductsEvent extends ProductEvent {
   LoadProductsEvent(this.umkmId);
 }
 
+class GetProductDetailEvent extends ProductEvent {
+  final int productId;
+
+  GetProductDetailEvent(this.productId);
+}
+
 class UpdateProductEvent extends ProductEvent {
   final String productId;
   final Product product;
