@@ -26,6 +26,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
 
   // Controllers
   final _namaController = TextEditingController();
+  final _hargaController = TextEditingController();
   final _deskripsiSingkatController = TextEditingController();
   final _deskripsiLengkapController = TextEditingController();
   final _khasiatController = TextEditingController();
@@ -42,6 +43,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
   @override
   void dispose() {
     _namaController.dispose();
+    _hargaController.dispose();
     _deskripsiSingkatController.dispose();
     _deskripsiLengkapController.dispose();
     _khasiatController.dispose();
@@ -151,6 +153,14 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                           label: 'Nama Produk',
                           hint: 'Contoh: Jamu Kunyit Asam',
                           isRequired: true,
+                        ),
+                        const SizedBox(height: 16),
+                        _buildTextField(
+                          controller: _hargaController,
+                          label: 'Harga',
+                          hint: 'Contoh: 25000',
+                          isRequired: true,
+                          keyboardType: TextInputType.number,
                         ),
                         const SizedBox(height: 16),
                         _buildTextField(
@@ -435,6 +445,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
         id: 0, // Akan diganti oleh database
         umkmId: widget.umkmId,
         namaProduk: _namaController.text,
+        harga: int.tryParse(_hargaController.text) ?? 0,
         deskripsiSingkat: _deskripsiSingkatController.text.isEmpty
             ? null
             : _deskripsiSingkatController.text,

@@ -5,6 +5,7 @@ class Product {
   final int id; // int4
   final String umkmId; // uuid - foreign key ke umkm_profiles
   final String namaProduk; // text
+  final int harga; // text
 
   // Field-field detail produk
   final String? deskripsiSingkat; // text
@@ -26,6 +27,7 @@ class Product {
     required this.id,
     required this.umkmId,
     required this.namaProduk,
+    required this.harga,
     this.deskripsiSingkat,
     this.deskripsiLengkap,
     this.khasiat,
@@ -53,6 +55,7 @@ class Product {
       id: json['id'] as int,
       umkmId: json['umkm_id'] as String,
       namaProduk: json['nama_produk'] as String,
+      harga: json['harga'] as int,
       deskripsiSingkat: json['deskripsi_singkat'] as String?,
       deskripsiLengkap: json['deskripsi_lengkap'] as String?,
       khasiat: json['khasiat'] as String?,
@@ -75,6 +78,7 @@ class Product {
       // id, created_at, dan updated_at biasanya dikelola oleh database
       'umkm_id': umkmId,
       'nama_produk': namaProduk,
+      'harga': harga,
       'deskripsi_singkat': deskripsiSingkat,
       'deskripsi_lengkap': deskripsiLengkap,
       'khasiat': khasiat,

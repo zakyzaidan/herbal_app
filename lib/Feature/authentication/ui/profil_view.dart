@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:herbal_app/Feature/authentication/bloc/auth_bloc.dart';
+import 'package:herbal_app/Feature/product/ui/form_create_product_view.dart';
 import 'package:herbal_app/Feature/settings/ui/settings_view.dart';
 import 'package:herbal_app/data/models/user_model.dart';
 import 'package:herbal_app/data/models/seller_model.dart';
@@ -255,6 +256,7 @@ class _SellerProfileViewState extends State<SellerProfileView>
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFF0A400C),
+
       body: SafeArea(
         child: Column(
           children: [
@@ -295,16 +297,22 @@ class _SellerProfileViewState extends State<SellerProfileView>
           ],
         ),
       ),
-      floatingActionButton: _tabController.index == 1
-          ? FloatingActionButton.extended(
-              onPressed: () {
-                // Navigate to add product
-              },
-              icon: const Icon(Icons.add),
-              label: const Text('Tambah Produk'),
-              backgroundColor: const Color(0xFF0A400C),
-            )
-          : null,
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () {
+          // Navigate to add product
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => ProductFormScreen(
+                umkmId: _sellerProfile!.id,
+                isFirstProduct: false,
+              ),
+            ),
+          );
+        },
+        icon: const Icon(Icons.add),
+        label: const Text('Tambah Produk'),
+        backgroundColor: const Color.fromARGB(255, 48, 172, 53),
+      ),
     );
   }
 
@@ -570,6 +578,15 @@ class _SellerProfileViewState extends State<SellerProfileView>
                   ),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'Rp ${product.harga}',
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.green[700],
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ],
             ),
