@@ -58,4 +58,9 @@ class CreateSellerProfileEvent extends AuthEvent {
   CreateSellerProfileEvent({required this.data, required this.userId});
 }
 
+class CreatePractitionerProfileEvent extends AuthEvent {
+  final Map<String, dynamic> data;
+  final String userId;
 
+  CreatePractitionerProfileEvent({required this.data, required this.userId});
+}

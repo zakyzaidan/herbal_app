@@ -19,11 +19,3 @@ final class RoleSwitchSuccess extends SettingsState {
 
   RoleSwitchSuccess(this.roleName);
 }
-
-final class SellerProfileCreated extends SettingsState {
-  final SellerProfile profile;
-
-  SellerProfileCreated(this.profile);
-}
-
-final class PractitionerProfileCreated extends SettingsState {}

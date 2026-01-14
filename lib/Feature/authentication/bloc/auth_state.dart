@@ -37,7 +37,7 @@ class AuthRegistrationOTPSent extends AuthState {
   List<Object?> get props => [email, password];
 }
 
-class SellerProfileLoading extends AuthState {}
+class CreateProfileLoading extends AuthState {}
 
 class SellerProfileSuccess extends AuthState {
   final SellerProfile profile;
@@ -45,8 +45,14 @@ class SellerProfileSuccess extends AuthState {
   SellerProfileSuccess(this.profile);
 }
 
-class SellerProfileError extends AuthState {
+class PractitionerProfileSuccess extends AuthState {
+  final PractitionerProfile profile;
+
+  PractitionerProfileSuccess(this.profile);
+}
+
+class CreateProfileError extends AuthState {
   final String message;
 
-  SellerProfileError(this.message);
+  CreateProfileError(this.message);
 }

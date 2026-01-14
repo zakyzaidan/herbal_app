@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:herbal_app/Feature/authentication/bloc/auth_bloc.dart';
+import 'package:herbal_app/Feature/authentication/ui/form_create_practitioner.dart';
 import 'package:herbal_app/Feature/authentication/ui/login_view.dart';
 import 'package:herbal_app/Feature/settings/bloc/settings_bloc.dart';
 import 'package:herbal_app/Feature/authentication/ui/form_create_seller.dart';
@@ -310,31 +311,32 @@ class RoleSelectionBottomSheet extends StatelessWidget {
           );
           // Refresh auth state
           authBloc.add(AuthCheckRequested());
-        } else if (state is SellerProfileCreated) {
-          Navigator.pop(context);
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Berhasil membuat akun penjual!'),
-              backgroundColor: Colors.green,
-            ),
-          );
-          // Refresh auth state
-          authBloc.add(AuthCheckRequested());
-        } else if (state is PractitionerProfileCreated) {
-          Navigator.pop(context);
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Berhasil membuat akun praktisi!'),
-              backgroundColor: Colors.green,
-            ),
-          );
-          // Refresh auth state
-          authBloc.add(AuthCheckRequested());
-        } else if (state is SettingsError) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(state.message), backgroundColor: Colors.red),
-          );
         }
+        // else if (state is SellerProfileCreated) {
+        //   Navigator.pop(context);
+        //   ScaffoldMessenger.of(context).showSnackBar(
+        //     const SnackBar(
+        //       content: Text('Berhasil membuat akun penjual!'),
+        //       backgroundColor: Colors.green,
+        //     ),
+        //   );
+        //   // Refresh auth state
+        //   authBloc.add(AuthCheckRequested());
+        // } else if (state is PractitionerProfileCreated) {
+        //   Navigator.pop(context);
+        //   ScaffoldMessenger.of(context).showSnackBar(
+        //     const SnackBar(
+        //       content: Text('Berhasil membuat akun praktisi!'),
+        //       backgroundColor: Colors.green,
+        //     ),
+        //   );
+        //   // Refresh auth state
+        //   authBloc.add(AuthCheckRequested());
+        // } else if (state is SettingsError) {
+        //   ScaffoldMessenger.of(context).showSnackBar(
+        //     SnackBar(content: Text(state.message), backgroundColor: Colors.red),
+        //   );
+        // }
       },
       builder: (context, settingsState) {
         return BlocBuilder<AuthBloc, AuthState>(
@@ -469,9 +471,13 @@ class RoleSelectionBottomSheet extends StatelessWidget {
             subtitle: 'Daftar sebagai praktisi herbal',
             onTap: () {
               Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Form Akun Praktisi Herbal (Coming Soon)'),
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => BlocProvider.value(
+                    value: authBloc,
+                    child: const PractitionerProfileFormScreen(),
+                  ),
                 ),
               );
             },
@@ -518,9 +524,13 @@ class RoleSelectionBottomSheet extends StatelessWidget {
             subtitle: 'Daftar sebagai praktisi herbal',
             onTap: () {
               Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Form Akun Praktisi Herbal (Coming Soon)'),
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => BlocProvider.value(
+                    value: authBloc,
+                    child: const PractitionerProfileFormScreen(),
+                  ),
                 ),
               );
             },

@@ -166,7 +166,7 @@ class _SellerProfileFormScreenState extends State<SellerProfileFormScreen> {
                         width: double.infinity,
                         height: 50,
                         child: ElevatedButton(
-                          onPressed: state is SellerProfileLoading
+                          onPressed: state is CreateProfileLoading
                               ? null
                               : () => _submitForm(context, bloc),
                           style: ElevatedButton.styleFrom(
@@ -175,7 +175,7 @@ class _SellerProfileFormScreenState extends State<SellerProfileFormScreen> {
                               borderRadius: BorderRadius.circular(12),
                             ),
                           ),
-                          child: state is SellerProfileLoading
+                          child: state is CreateProfileLoading
                               ? const SizedBox(
                                   height: 20,
                                   width: 20,
@@ -201,7 +201,7 @@ class _SellerProfileFormScreenState extends State<SellerProfileFormScreen> {
                   ),
                 ),
               ),
-              if (state is SellerProfileError)
+              if (state is CreateProfileError)
                 Positioned(
                   top: 0,
                   left: 0,

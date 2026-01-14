@@ -1,7 +1,9 @@
 import 'package:bloc/bloc.dart';
+import 'package:herbal_app/data/models/practitioner_model.dart';
 import 'package:herbal_app/data/models/seller_model.dart';
 import 'package:herbal_app/data/models/user_model.dart';
 import 'package:herbal_app/data/services/auth_services.dart';
+import 'package:herbal_app/data/services/practitioner_services.dart';
 import 'package:herbal_app/data/services/seller_services.dart';
 import 'package:meta/meta.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -12,6 +14,7 @@ part 'auth_state.dart';
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final AuthServices _authRepository = AuthServices();
   final SellerServices sellerServices = SellerServices();
+  final PractitionerServices practitionerServices = PractitionerServices();
 
   AuthBloc() : super(AuthInitial()) {
     on<AuthCheckRequested>(_onAuthCheckRequested);
@@ -24,6 +27,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<AuthSendRegistrationOTPRequested>(_onAuthSendRegistrationOTPRequested);
     on<AuthGoogleSignInRequested>(_onAuthGoogleSignInRequested);
     on<CreateSellerProfileEvent>(_onCreateSellerProfile);
+    on<CreatePractitionerProfileEvent>(_onCreatePractitionerProfile);
   }
 
   void _onAuthCheckRequested(
@@ -31,15 +35,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     Emitter<AuthState> emit,
   ) async {
     final user = await _authRepository.getCurrentUser();
-    print(
-      'AuthCheckRequested: current user = $user' +
-          '========================================================',
-    );
+
     if (user != null) {
-      print(user.email);
       emit(AuthAuthenticated(user));
     } else {
-      print('========================================================');
       emit(AuthUnauthenticated());
     }
   }
@@ -147,7 +146,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     CreateSellerProfileEvent event,
     Emitter<AuthState> emit,
   ) async {
-    emit(SellerProfileLoading());
+    emit(CreateProfileLoading());
     try {
       final profile = await sellerServices.createProfile(
         event.data,
@@ -166,7 +165,34 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       }
       emit(SellerProfileSuccess(profile));
     } catch (e) {
-      emit(SellerProfileError(e.toString()));
+      emit(CreateProfileError(e.toString()));
+    }
+  }
+
+  Future<void> _onCreatePractitionerProfile(
+    CreatePractitionerProfileEvent event,
+    Emitter<AuthState> emit,
+  ) async {
+    emit(CreateProfileLoading());
+    try {
+      final profile = await practitionerServices.createProfile(
+        event.data,
+        event.userId,
+      );
+      final activeRole = await _authRepository.getActiveRole();
+      print('Role saat ini: ${activeRole?.roleName}');
+
+      // Assign role praktisi (user sekarang punya 2 role)
+      bool success = await _authRepository.assignRole(
+        'praktisi',
+        setActive: true,
+      );
+      if (success) {
+        print('Berhasil upgrade ke praktisi!');
+      }
+      emit(PractitionerProfileSuccess(profile));
+    } catch (e) {
+      emit(CreateProfileError(e.toString()));
     }
   }
 

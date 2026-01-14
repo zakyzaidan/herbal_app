@@ -47,6 +47,7 @@ dependencies:
   flutter_dotenv: ^6.0.0
   image_picker:
   uuid:
+  flutter_staggered_grid_view:
 
 dev_dependencies:
   flutter_test:
