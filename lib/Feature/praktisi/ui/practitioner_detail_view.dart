@@ -23,7 +23,7 @@ class PractitionerDetailView extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     _buildHeader(context),
-                    _buildProfileSection(),
+                    _buildProfileSection(context),
                     const Divider(height: 32),
                     _buildInfoSection(),
                     const SizedBox(height: 24),
@@ -31,7 +31,6 @@ class PractitionerDetailView extends StatelessWidget {
                 ),
               ),
             ),
-            _buildBottomBar(context),
           ],
         ),
       ),
@@ -93,17 +92,16 @@ class PractitionerDetailView extends StatelessWidget {
     );
   }
 
-  Widget _buildProfileSection() {
+  Widget _buildProfileSection(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             practitioner.fullName,
             style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 4),
           Text(
             practitioner.title,
             style: TextStyle(
@@ -113,8 +111,9 @@ class PractitionerDetailView extends StatelessWidget {
             ),
           ),
           if (practitioner.city != null) ...[
-            const SizedBox(height: 12),
+            const SizedBox(height: 4),
             Row(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Icon(Icons.location_on, size: 18, color: Colors.grey[600]),
                 const SizedBox(width: 4),
@@ -123,6 +122,63 @@ class PractitionerDetailView extends StatelessWidget {
                   style: TextStyle(fontSize: 14, color: Colors.grey[600]),
                 ),
               ],
+            ),
+          ],
+          const SizedBox(height: 16),
+          ElevatedButton.icon(
+            onPressed: () => _contactPractitioner(context),
+            icon: const Icon(Icons.phone, color: Colors.white),
+            label: const Text(
+              'Hubungi Praktisi',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF0A400C),
+              padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildInfoSection() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Tentang Praktisi',
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 12),
+          if (practitioner.educationHistory != null) ...[
+            _buildInfoRow(
+              'Riwayat Pendidikan/Pelatihan',
+              practitioner.educationHistory!,
+            ),
+          ],
+          if (practitioner.trainingInstitution != null) ...[
+            _buildInfoRow(
+              'Institusi Pelatihan',
+              practitioner.trainingInstitution!,
+            ),
+          ],
+          if (practitioner.practiceName != null) ...[
+            _buildInfoRow('Tempat Praktik', practitioner.practiceName!),
+          ],
+          if (practitioner.certificationNumber != null) ...[
+            _buildInfoRow(
+              'Sertifikasi - Surat Izin Praktik',
+              practitioner.certificationNumber!,
             ),
           ],
           if (practitioner.services != null &&
@@ -151,18 +207,8 @@ class PractitionerDetailView extends StatelessWidget {
               }).toList(),
             ),
           ],
-        ],
-      ),
-    );
-  }
-
-  Widget _buildInfoSection() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
           if (practitioner.description != null) ...[
+            const SizedBox(height: 24),
             const Text(
               'Deskripsi',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
@@ -177,37 +223,6 @@ class PractitionerDetailView extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 24),
-          ],
-          if (practitioner.educationHistory != null) ...[
-            _buildInfoRow(
-              'Riwayat Pendidikan/Pelatihan',
-              practitioner.educationHistory!,
-            ),
-          ],
-          if (practitioner.trainingInstitution != null) ...[
-            _buildInfoRow(
-              'Institusi Pelatihan',
-              practitioner.trainingInstitution!,
-            ),
-          ],
-          if (practitioner.practiceName != null) ...[
-            const SizedBox(height: 16),
-            const Text(
-              'Tempat Praktik',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 12),
-            _buildInfoRow('Nama', practitioner.practiceName!),
-          ],
-          if (practitioner.practiceAddress != null) ...[
-            _buildInfoRow('Alamat', practitioner.practiceAddress!),
-          ],
-          if (practitioner.certificationNumber != null) ...[
-            const SizedBox(height: 16),
-            _buildInfoRow(
-              'Sertifikasi - Surat Izin Praktik',
-              practitioner.certificationNumber!,
-            ),
           ],
         ],
       ),
@@ -231,43 +246,6 @@ class PractitionerDetailView extends StatelessWidget {
           const SizedBox(height: 4),
           Text(value, style: const TextStyle(fontSize: 14)),
         ],
-      ),
-    );
-  }
-
-  Widget _buildBottomBar(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, -2),
-          ),
-        ],
-      ),
-      child: SafeArea(
-        child: ElevatedButton.icon(
-          onPressed: () => _contactPractitioner(context),
-          icon: const Icon(Icons.phone, color: Colors.white),
-          label: const Text(
-            'Hubungi Praktisi',
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-            ),
-          ),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: const Color(0xFF0A400C),
-            padding: const EdgeInsets.symmetric(vertical: 16),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-          ),
-        ),
       ),
     );
   }

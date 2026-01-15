@@ -288,6 +288,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
             });
           },
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               if (widget.product.deskripsiLengkap != null) ...[
                 const SizedBox(height: 16),
@@ -303,7 +304,9 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                   ),
                 ),
               ],
-              const SizedBox(height: 16),
+              const SizedBox(height: 8),
+              Divider(height: 1, color: Colors.grey[300]),
+              const SizedBox(height: 8),
               _buildDetailTable(),
             ],
           ),
@@ -318,8 +321,12 @@ class _ProductDetailViewState extends State<ProductDetailView> {
             });
           },
           child: widget.product.informasiPenting != null
-              ? Padding(
-                  padding: const EdgeInsets.all(24),
+              ? Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 16,
+                  ),
+                  alignment: Alignment.topLeft,
                   child: Text(
                     widget.product.informasiPenting!,
                     style: TextStyle(
@@ -583,7 +590,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
               subtitle: 'Hapus produk secara permanen',
               titleColor: Colors.red,
               iconColor: Colors.red,
-              onTap: () {
+              onTap: () async {
                 Navigator.pop(bottomSheetContext);
                 _showDeleteConfirmation(context);
               },
@@ -655,8 +662,8 @@ class _ProductDetailViewState extends State<ProductDetailView> {
     );
   }
 
-  void _showDeleteConfirmation(BuildContext context) {
-    showDialog(
+  Future<dynamic> _showDeleteConfirmation(BuildContext context) {
+    return showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -666,27 +673,17 @@ class _ProductDetailViewState extends State<ProductDetailView> {
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(dialogContext),
+            onPressed: () => Navigator.pop(context),
             child: const Text('Batal'),
           ),
-          BlocBuilder<ProductBloc, ProductState>(
-            builder: (context, state) {
-              final isLoading = state is ProductLoading;
-              return TextButton(
-                onPressed: isLoading
-                    ? null
-                    : () {
-                        Navigator.pop(dialogContext);
-                        context.read<ProductBloc>().add(
-                          DeleteProductEvent(widget.product.id.toString()),
-                        );
-                      },
-                child: Text(
-                  isLoading ? 'Menghapus...' : 'Hapus',
-                  style: const TextStyle(color: Colors.red),
-                ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              context.read<ProductBloc>().add(
+                DeleteProductEvent(widget.product.id.toString()),
               );
             },
+            child: Text('Hapus', style: const TextStyle(color: Colors.red)),
           ),
         ],
       ),

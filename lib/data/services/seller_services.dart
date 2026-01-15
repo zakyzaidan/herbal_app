@@ -36,13 +36,17 @@ class SellerServices {
   }
 
   // --- 2. Menyimpan/Membuat Profil UMKM Baru ---
-  Future<SellerProfile> createProfile(Map<String, dynamic> data, String userId) async {
+  Future<SellerProfile> createProfile(
+    Map<String, dynamic> data,
+    String userId,
+  ) async {
     try {
       // Pastikan 'user_id' sudah diisi di objek 'profile' sebelum memanggil service
       final PostgrestMap response = await supabase
           .from(_sellerTableName)
           .insert({...data, 'user_id': userId})
-          .select().single(); // Mengembalikan data yang baru saja di-insert
+          .select()
+          .single(); // Mengembalikan data yang baru saja di-insert
 
       // Supabase insert mengembalikan list of maps, ambil item pertama
       return SellerProfile.fromJson(response);
