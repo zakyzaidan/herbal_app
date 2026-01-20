@@ -3,7 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:herbal_app/Feature/home/bloc/home_bloc.dart';
 import 'package:herbal_app/Feature/home/ui/home_img_slider.dart';
 import 'package:herbal_app/components/produk_cart.dart';
-import 'package:herbal_app/components/practitioner_card.dart';
+import 'package:herbal_app/components/practitioner_card_vertical.dart';
+import 'package:herbal_app/components/search_bar_widget.dart';
 import 'package:herbal_app/data/models/product_model.dart';
 import 'package:herbal_app/data/models/practitioner_model.dart';
 
@@ -38,38 +39,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 child: Row(
                   children: [
-                    Expanded(
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 12,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(25),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.05),
-                              blurRadius: 10,
-                              offset: const Offset(0, 2),
-                            ),
-                          ],
-                        ),
-                        child: Row(
-                          children: [
-                            Icon(Icons.search, color: Colors.grey[600]),
-                            const SizedBox(width: 12),
-                            Text(
-                              "Search candles",
-                              style: TextStyle(
-                                fontSize: 15,
-                                color: Colors.grey[600],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
+                    Expanded(child: searchBar(() {}, "Cari produk herbal...")),
                     const SizedBox(width: 12),
                     Container(
                       padding: const EdgeInsets.all(12),
@@ -251,7 +221,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   // TODO: Navigate to all practitioners
                 },
                 child: Text(
-                  'Lebih banyak›',
+                  'Lebih banyak',
                   style: TextStyle(color: Colors.green[700], fontSize: 14),
                 ),
               ),
@@ -279,7 +249,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   itemBuilder: (context, index) {
                     return SizedBox(
                       width: 180,
-                      child: PractitionerCard(
+                      child: PractitionerCardVertical(
                         practitioner: practitioners[index],
                       ),
                     );

@@ -9,16 +9,23 @@ class ProductLoading extends ProductState {}
 
 class ProductDeletedSuccess extends ProductState {}
 
+class AllProductsLoaded extends ProductState {
+  final List<Product> products;
+  final List<String> categories;
+
+  AllProductsLoaded(this.products, this.categories);
+}
+
 class ProductCreatedSuccess extends ProductState {
   final Product product;
 
   ProductCreatedSuccess(this.product);
 }
 
-class ProductsLoaded extends ProductState {
+class ProductsSellerLoaded extends ProductState {
   final List<Product> products;
 
-  ProductsLoaded(this.products);
+  ProductsSellerLoaded(this.products);
 }
 
 class ProductDetailLoaded extends ProductState {

@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:herbal_app/Feature/praktisi/ui/practitioner_detail_view.dart';
 import 'package:herbal_app/data/models/practitioner_model.dart';
 
-class PractitionerCard extends StatelessWidget {
+class PractitionerCardVertical extends StatelessWidget {
   final PractitionerProfile practitioner;
 
-  const PractitionerCard({super.key, required this.practitioner});
+  const PractitionerCardVertical({super.key, required this.practitioner});
 
   @override
   Widget build(BuildContext context) {

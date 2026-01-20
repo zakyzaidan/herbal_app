@@ -196,7 +196,7 @@ class BasicProfileView extends StatelessWidget {
               ),
               const SizedBox(height: 16),
               Text(
-                'Kamu Belum Positn Apapun',
+                'Kamu Belum Posting Apapun',
                 style: TextStyle(fontSize: 16, color: Colors.grey[600]),
               ),
             ],

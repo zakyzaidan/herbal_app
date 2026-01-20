@@ -24,7 +24,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     emit(HomeLoading());
     try {
       // Load produk terbaru (15 produk)
-      final products = await _sellerServices.getNewestProducts('');
+      final products = await _sellerServices.getNewestProducts();
 
       // Load semua praktisi
       final practitioners = await _practitionerServices.getAllPractitioners();

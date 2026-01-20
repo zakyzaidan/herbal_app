@@ -1,4 +1,6 @@
 // product_bloc.dart
+import 'dart:async';
+
 import 'package:bloc/bloc.dart';
 import 'package:herbal_app/data/models/product_model.dart';
 import 'package:herbal_app/data/services/seller_services.dart';
@@ -11,8 +13,9 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
   final SellerServices _sellerServices = SellerServices();
 
   ProductBloc() : super(ProductInitial()) {
+    on<LoadAllProductsEvent>(_onLoadAllProducts);
     on<CreateProductEvent>(_onCreateProduct);
-    on<LoadProductsEvent>(_onLoadProducts);
+    on<LoadProductsSellerEvent>(_onLoadSellerProducts);
     on<GetProductDetailEvent>(_onGetProductDetail);
     on<UpdateProductEvent>(_onUpdateProduct);
     on<DeleteProductEvent>(_onDeleteProduct);
@@ -31,14 +34,14 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
     }
   }
 
-  Future<void> _onLoadProducts(
-    LoadProductsEvent event,
+  Future<void> _onLoadSellerProducts(
+    LoadProductsSellerEvent event,
     Emitter<ProductState> emit,
   ) async {
     emit(ProductLoading());
     try {
       final products = await _sellerServices.getProductsByUmkmId(event.umkmId);
-      emit(ProductsLoaded(products));
+      emit(ProductsSellerLoaded(products));
     } catch (e) {
       emit(ProductError(e.toString()));
     }
@@ -85,6 +88,26 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
     try {
       await _sellerServices.deleteProduct(int.parse(event.productId));
       emit(ProductDeletedSuccess());
+    } catch (e) {
+      emit(ProductError(e.toString()));
+    }
+  }
+
+  FutureOr<void> _onLoadAllProducts(
+    LoadAllProductsEvent event,
+    Emitter<ProductState> emit,
+  ) async {
+    emit(ProductLoading());
+    try {
+      final products = await _sellerServices.getAllProducts();
+      // Ekstrak dan gabungkan semua kategori dari produk
+      final Set<String> categoriesSet = {};
+      for (var product in products) {
+        if (product.kategori != null) {
+          categoriesSet.addAll(product.kategori!);
+        }
+      }
+      emit(AllProductsLoaded(products, categoriesSet.toList()));
     } catch (e) {
       emit(ProductError(e.toString()));
     }

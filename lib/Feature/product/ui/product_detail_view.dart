@@ -385,8 +385,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
 
   Widget _buildDetailTable() {
     final details = [
-      if (widget.product.namaProduk != null)
-        {'label': 'Nama Produk', 'value': widget.product.namaProduk},
+      {'label': 'Nama Produk', 'value': widget.product.namaProduk},
       if (widget.product.khasiat != null)
         {'label': 'Khasiat', 'value': widget.product.khasiat!},
       if (widget.product.kemasan != null)

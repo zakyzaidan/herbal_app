@@ -117,8 +117,8 @@ class SellerServices {
     }
   }
 
-  // --- 2. Mendapatkan Semua Produk untuk Suatu UMKM ---
-  Future<List<Product>> getNewestProducts(String umkmId) async {
+  // --- 2. Mendapatkan 15 Produk Terbaru ---
+  Future<List<Product>> getNewestProducts() async {
     try {
       final response = await supabase
           .from(_productTableName)
@@ -126,7 +126,23 @@ class SellerServices {
           .order('created_at', ascending: false)
           .limit(15);
 
-      // Mapping hasil List<Map<String, dynamic>> menjadi List<Product>
+      return (response as List<dynamic>)
+          .map((json) => Product.fromJson(json as Map<String, dynamic>))
+          .toList();
+    } catch (e) {
+      throw Exception('Gagal mengambil daftar produk: $e');
+    }
+  }
+
+  // --- 2. Mendapatkan semua produk ---
+  Future<List<Product>> getAllProducts() async {
+    try {
+      final response = await supabase
+          .from(_productTableName)
+          .select()
+          .order('created_at', ascending: false)
+          .limit(1000);
+
       return (response as List<dynamic>)
           .map((json) => Product.fromJson(json as Map<String, dynamic>))
           .toList();
