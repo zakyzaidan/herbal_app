@@ -1,18 +1,20 @@
+// lib/Feature/home/bloc/home_bloc.dart
 import 'package:bloc/bloc.dart';
 import 'package:herbal_app/data/models/product_model.dart';
 import 'package:herbal_app/data/models/practitioner_model.dart';
-import 'package:herbal_app/data/services/seller_services.dart';
-import 'package:herbal_app/data/services/practitioner_services.dart';
+import 'package:herbal_app/data/repositories/product_repository.dart';
+import 'package:herbal_app/data/repositories/practitioner_repository.dart';
 import 'package:meta/meta.dart';
 
 part 'home_event.dart';
 part 'home_state.dart';
 
 class HomeBloc extends Bloc<HomeEvent, HomeState> {
-  final SellerServices _sellerServices = SellerServices();
-  final PractitionerServices _practitionerServices = PractitionerServices();
+  final ProductRepository _productRepository;
+  final PractitionerRepository _practitionerRepository;
 
-  HomeBloc() : super(HomeInitial()) {
+  HomeBloc(this._productRepository, this._practitionerRepository)
+    : super(HomeInitial()) {
     on<LoadHomeDataEvent>(_onLoadHomeData);
     on<SelectCategoryEvent>(_onSelectCategory);
   }
@@ -21,15 +23,26 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     LoadHomeDataEvent event,
     Emitter<HomeState> emit,
   ) async {
-    emit(HomeLoading());
+    // Jangan emit loading jika sudah ada data
+    if (state is! HomeLoaded) {
+      emit(HomeLoading());
+    }
+
     try {
-      // Load produk terbaru (15 produk)
-      final products = await _sellerServices.getNewestProducts();
+      // Load data secara parallel untuk performa lebih baik
+      final results = await Future.wait([
+        _productRepository.getNewestProducts(
+          forceRefresh: event.forceRefresh ?? false,
+        ),
+        _practitionerRepository.getAllPractitioners(
+          forceRefresh: event.forceRefresh ?? false,
+        ),
+      ]);
 
-      // Load semua praktisi
-      final practitioners = await _practitionerServices.getAllPractitioners();
+      final products = results[0] as List<Product>;
+      final practitioners = results[1] as List<PractitionerProfile>;
 
-      // Ekstrak dan gabungkan semua kategori dari produk
+      // Ekstrak kategori
       final Set<String> categoriesSet = {};
       for (var product in products) {
         if (product.kategori != null) {
@@ -37,7 +50,6 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         }
       }
 
-      // Convert ke list dan sort
       final List<String> categories = categoriesSet.toList()..sort();
 
       emit(
@@ -45,7 +57,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
           products: products,
           practitioners: practitioners,
           categories: categories,
-          selectedCategory: null, // Tidak ada kategori yang dipilih
+          selectedCategory: null,
         ),
       );
     } catch (e) {
@@ -60,7 +72,6 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     if (state is HomeLoaded) {
       final currentState = state as HomeLoaded;
 
-      // Jika kategori yang sama diklik lagi, batalkan seleksi
       final newSelectedCategory =
           currentState.selectedCategory == event.category
           ? null
@@ -74,13 +85,6 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
           selectedCategory: newSelectedCategory,
         ),
       );
-
-      // TODO: Coming soon - Filter produk berdasarkan kategori
-      // Nanti akan navigate ke halaman product dengan filter kategori
-      if (newSelectedCategory != null) {
-        print('Category selected: $newSelectedCategory');
-        // Navigator.push(...) ke halaman product dengan filter
-      }
     }
   }
 }

@@ -46,7 +46,6 @@ class _PractitionerProfileViewState extends State<PractitionerProfileView>
       }
     } catch (e) {
       setState(() => _isLoading = false);
-      print('Error loading practitioner data: $e');
     }
   }
 

@@ -104,23 +104,23 @@ class PractitionerServices {
     }
   }
 
-  // Mencari praktisi berdasarkan layanan atau kota
-  Future<List<PractitionerProfile>> searchPractitioners({
-    String? service,
-    String? city,
-  }) async {
+  // Mencari praktisi berdasarkan query (mencari di nama ATAU layanan)
+  Future<List<PractitionerProfile>> searchPractitioners(
+    String queryText,
+  ) async {
     try {
-      var query = supabase.from(_tableName).select();
+      // 1. Buat filter string untuk operator OR
+      // 'full_name.ilike.%$queryText%,services.cs.{$queryText}'
+      // ilike: case-insensitive search untuk nama
+      // cs (contains): mengecek apakah array 'services' mengandung queryText
+      final String orFilter =
+          'full_name.ilike.%$queryText%,services.cs.{$queryText}';
 
-      if (service != null) {
-        query = query.contains('services', [service]);
-      }
-
-      if (city != null) {
-        query = query.ilike('city', '%$city%');
-      }
-
-      final response = await query.order('created_at', ascending: false);
+      final response = await supabase
+          .from(_tableName)
+          .select()
+          .or(orFilter) // Menggabungkan kedua kondisi dengan OR
+          .order('created_at', ascending: false);
 
       return (response as List<dynamic>)
           .map(

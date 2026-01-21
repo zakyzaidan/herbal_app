@@ -89,7 +89,6 @@ class SellerServices {
       // Panggil UmkmProfileService Anda di sini:
       // await UmkmProfileService().updateProfile(userId, {'business_logo': publicUrl});
 
-      print('Logo berhasil diunggah. URL: $publicUrl');
       return publicUrl;
     }
     return null;
@@ -134,14 +133,14 @@ class SellerServices {
     }
   }
 
-  // --- 2. Mendapatkan semua produk ---
+  // --- 3. Mendapatkan semua produk ---
   Future<List<Product>> getAllProducts() async {
     try {
       final response = await supabase
           .from(_productTableName)
           .select()
           .order('created_at', ascending: false)
-          .limit(1000);
+          .limit(100);
 
       return (response as List<dynamic>)
           .map((json) => Product.fromJson(json as Map<String, dynamic>))

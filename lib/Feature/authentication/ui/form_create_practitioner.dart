@@ -9,7 +9,7 @@ import 'package:herbal_app/main_navigation.dart';
 import 'package:image_picker/image_picker.dart';
 
 class PractitionerProfileFormScreen extends StatefulWidget {
-  const PractitionerProfileFormScreen({Key? key}) : super(key: key);
+  const PractitionerProfileFormScreen({super.key});
 
   @override
   State<PractitionerProfileFormScreen> createState() =>

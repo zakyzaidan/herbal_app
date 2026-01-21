@@ -12,12 +12,10 @@ class PraktisiView extends StatefulWidget {
 }
 
 class _PraktisiViewState extends State<PraktisiView> {
-  PraktisiBloc praktisiBloc = PraktisiBloc();
-
   @override
   void initState() {
     super.initState();
-    praktisiBloc.add(LoadPractitionersEvent());
+    context.read<PraktisiBloc>().add(LoadPractitionersEvent());
   }
 
   @override
@@ -36,7 +34,6 @@ class _PraktisiViewState extends State<PraktisiView> {
             const SizedBox(height: 16),
             Expanded(
               child: BlocBuilder<PraktisiBloc, PraktisiState>(
-                bloc: praktisiBloc,
                 builder: (context, state) {
                   if (state is PraktisiLoading) {
                     return const Center(child: CircularProgressIndicator());

@@ -1,18 +1,18 @@
-// product_bloc.dart
+// lib/Feature/product/bloc/product_bloc.dart
 import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:herbal_app/data/models/product_model.dart';
-import 'package:herbal_app/data/services/seller_services.dart';
+import 'package:herbal_app/data/repositories/product_repository.dart';
 import 'package:meta/meta.dart';
 
 part 'product_event.dart';
 part 'product_state.dart';
 
 class ProductBloc extends Bloc<ProductEvent, ProductState> {
-  final SellerServices _sellerServices = SellerServices();
+  final ProductRepository _repository;
 
-  ProductBloc() : super(ProductInitial()) {
+  ProductBloc(this._repository) : super(ProductInitial()) {
     on<LoadAllProductsEvent>(_onLoadAllProducts);
     on<CreateProductEvent>(_onCreateProduct);
     on<LoadProductsSellerEvent>(_onLoadSellerProducts);
@@ -21,13 +21,41 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
     on<DeleteProductEvent>(_onDeleteProduct);
   }
 
+  Future<void> _onLoadAllProducts(
+    LoadAllProductsEvent event,
+    Emitter<ProductState> emit,
+  ) async {
+    // Jangan emit loading jika sudah ada data (untuk menghindari flicker)
+    if (state is! AllProductsLoaded) {
+      emit(ProductLoading());
+    }
+
+    try {
+      final products = await _repository.getAllProducts(
+        forceRefresh: event.forceRefresh ?? false,
+      );
+
+      // Ekstrak kategori
+      final Set<String> categoriesSet = {};
+      for (var product in products) {
+        if (product.kategori != null) {
+          categoriesSet.addAll(product.kategori!);
+        }
+      }
+
+      emit(AllProductsLoaded(products, categoriesSet.toList()));
+    } catch (e) {
+      emit(ProductError(e.toString()));
+    }
+  }
+
   Future<void> _onCreateProduct(
     CreateProductEvent event,
     Emitter<ProductState> emit,
   ) async {
     emit(ProductLoading());
     try {
-      final product = await _sellerServices.addProduct(event.productInput);
+      final product = await _repository.addProduct(event.productInput);
       emit(ProductCreatedSuccess(product));
     } catch (e) {
       emit(ProductError(e.toString()));
@@ -38,9 +66,15 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
     LoadProductsSellerEvent event,
     Emitter<ProductState> emit,
   ) async {
-    emit(ProductLoading());
+    if (state is! ProductsSellerLoaded) {
+      emit(ProductLoading());
+    }
+
     try {
-      final products = await _sellerServices.getProductsByUmkmId(event.umkmId);
+      final products = await _repository.getProductsByUmkmId(
+        event.umkmId,
+        forceRefresh: event.forceRefresh ?? false,
+      );
       emit(ProductsSellerLoaded(products));
     } catch (e) {
       emit(ProductError(e.toString()));
@@ -53,7 +87,7 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
   ) async {
     emit(ProductLoading());
     try {
-      final product = await _sellerServices.getProductById(event.productId);
+      final product = await _repository.getProductById(event.productId);
       if (product != null) {
         emit(ProductDetailLoaded(product));
       } else {
@@ -70,7 +104,7 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
   ) async {
     emit(ProductLoading());
     try {
-      final product = await _sellerServices.updateProduct(
+      final product = await _repository.updateProduct(
         int.parse(event.productId),
         event.product,
       );
@@ -86,28 +120,8 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
   ) async {
     emit(ProductLoading());
     try {
-      await _sellerServices.deleteProduct(int.parse(event.productId));
+      await _repository.deleteProduct(int.parse(event.productId));
       emit(ProductDeletedSuccess());
-    } catch (e) {
-      emit(ProductError(e.toString()));
-    }
-  }
-
-  FutureOr<void> _onLoadAllProducts(
-    LoadAllProductsEvent event,
-    Emitter<ProductState> emit,
-  ) async {
-    emit(ProductLoading());
-    try {
-      final products = await _sellerServices.getAllProducts();
-      // Ekstrak dan gabungkan semua kategori dari produk
-      final Set<String> categoriesSet = {};
-      for (var product in products) {
-        if (product.kategori != null) {
-          categoriesSet.addAll(product.kategori!);
-        }
-      }
-      emit(AllProductsLoaded(products, categoriesSet.toList()));
     } catch (e) {
       emit(ProductError(e.toString()));
     }

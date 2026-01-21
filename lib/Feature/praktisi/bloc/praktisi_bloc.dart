@@ -1,39 +1,53 @@
+// lib/Feature/praktisi/bloc/praktisi_bloc.dart
 import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:herbal_app/data/models/practitioner_model.dart';
-import 'package:herbal_app/data/services/practitioner_services.dart';
+import 'package:herbal_app/data/repositories/practitioner_repository.dart';
 import 'package:meta/meta.dart';
 
 part 'praktisi_event.dart';
 part 'praktisi_state.dart';
 
 class PraktisiBloc extends Bloc<PraktisiEvent, PraktisiState> {
-  PractitionerServices _practitionerServices = PractitionerServices();
+  final PractitionerRepository _repository;
 
-  PraktisiBloc() : super(PraktisiInitial()) {
+  PraktisiBloc(this._repository) : super(PraktisiInitial()) {
     on<LoadPractitionersEvent>(_onLoadPractitioners);
     on<SearchPractitionersEvent>(_onSearchPractitioners);
   }
 
-  FutureOr<void> _onLoadPractitioners(
+  Future<void> _onLoadPractitioners(
     LoadPractitionersEvent event,
     Emitter<PraktisiState> emit,
   ) async {
-    emit(PraktisiLoading());
-    List<PractitionerProfile> practitioners = await _practitionerServices
-        .getAllPractitioners();
-    emit(PraktisiLoaded(practitioners));
+    if (state is! PraktisiLoaded) {
+      emit(PraktisiLoading());
+    }
+
+    try {
+      final practitioners = await _repository.getAllPractitioners(
+        forceRefresh: event.forceRefresh ?? false,
+      );
+      emit(PraktisiLoaded(practitioners));
+    } catch (e) {
+      emit(PraktisiError(e.toString()));
+    }
   }
 
-  FutureOr<void> _onSearchPractitioners(
+  Future<void> _onSearchPractitioners(
     SearchPractitionersEvent event,
     Emitter<PraktisiState> emit,
-  ) {
+  ) async {
     emit(PraktisiLoading());
-    // Simulate searching practitioners
-    Future.delayed(const Duration(seconds: 2), () {
-      emit(PraktisiLoaded([]));
-    });
+
+    try {
+      final practitioners = await _repository.searchPractitioners(
+        query: event.query,
+      );
+      emit(PraktisiLoaded(practitioners));
+    } catch (e) {
+      emit(PraktisiError(e.toString()));
+    }
   }
 }

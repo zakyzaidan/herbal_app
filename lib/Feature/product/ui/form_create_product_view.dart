@@ -101,181 +101,177 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => ProductBloc(),
-      child: Scaffold(
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: AppBar(
         backgroundColor: Colors.white,
-        appBar: AppBar(
-          backgroundColor: Colors.white,
-          elevation: 0,
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back, color: Colors.black),
-            onPressed: () => Navigator.pop(context),
-          ),
-          title: const Text(
-            'Tambah Produk',
-            style: TextStyle(
-              color: Colors.black,
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-            ),
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          onPressed: () => Navigator.pop(context),
+        ),
+        title: const Text(
+          'Tambah Produk',
+          style: TextStyle(
+            color: Colors.black,
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
           ),
         ),
-        body: BlocConsumer<ProductBloc, ProductState>(
-          listener: (context, state) {
-            if (state is ProductCreatedSuccess) {
-              _showSuccessDialog(context);
-            } else if (state is ProductError) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(state.message),
-                  backgroundColor: Colors.red,
-                ),
-              );
-            }
-          },
-          builder: (context, state) {
-            final isLoading = state is ProductLoading;
+      ),
+      body: BlocConsumer<ProductBloc, ProductState>(
+        listener: (context, state) {
+          if (state is ProductCreatedSuccess) {
+            _showSuccessDialog(context);
+          } else if (state is ProductError) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(state.message),
+                backgroundColor: Colors.red,
+              ),
+            );
+          }
+        },
+        builder: (context, state) {
+          final isLoading = state is ProductLoading;
 
-            return Stack(
-              children: [
-                SingleChildScrollView(
-                  padding: const EdgeInsets.all(24),
-                  child: Form(
-                    key: _formKey,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _buildSectionTitle('Informasi Dasar'),
-                        const SizedBox(height: 16),
-                        _buildTextField(
-                          controller: _namaController,
-                          label: 'Nama Produk',
-                          hint: 'Contoh: Jamu Kunyit Asam',
-                          isRequired: true,
-                        ),
-                        const SizedBox(height: 16),
-                        _buildTextField(
-                          controller: _hargaController,
-                          label: 'Harga',
-                          hint: 'Contoh: 25000',
-                          isRequired: true,
-                          keyboardType: TextInputType.number,
-                        ),
-                        const SizedBox(height: 16),
-                        _buildTextField(
-                          controller: _deskripsiSingkatController,
-                          label: 'Deskripsi Singkat',
-                          hint: 'Deskripsi singkat produk (max 100 karakter)',
-                          maxLines: 2,
-                        ),
-                        const SizedBox(height: 16),
-                        _buildTextField(
-                          controller: _kategoriController,
-                          label: 'Kategori',
-                          hint:
-                              'Pisahkan dengan koma (,). Contoh: Jamu, Minuman',
-                        ),
-                        const SizedBox(height: 24),
+          return Stack(
+            children: [
+              SingleChildScrollView(
+                padding: const EdgeInsets.all(24),
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildSectionTitle('Informasi Dasar'),
+                      const SizedBox(height: 16),
+                      _buildTextField(
+                        controller: _namaController,
+                        label: 'Nama Produk',
+                        hint: 'Contoh: Jamu Kunyit Asam',
+                        isRequired: true,
+                      ),
+                      const SizedBox(height: 16),
+                      _buildTextField(
+                        controller: _hargaController,
+                        label: 'Harga',
+                        hint: 'Contoh: 25000',
+                        isRequired: true,
+                        keyboardType: TextInputType.number,
+                      ),
+                      const SizedBox(height: 16),
+                      _buildTextField(
+                        controller: _deskripsiSingkatController,
+                        label: 'Deskripsi Singkat',
+                        hint: 'Deskripsi singkat produk (max 100 karakter)',
+                        maxLines: 2,
+                      ),
+                      const SizedBox(height: 16),
+                      _buildTextField(
+                        controller: _kategoriController,
+                        label: 'Kategori',
+                        hint: 'Pisahkan dengan koma (,). Contoh: Jamu, Minuman',
+                      ),
+                      const SizedBox(height: 24),
 
-                        _buildSectionTitle('Gambar Produk'),
-                        const SizedBox(height: 16),
-                        _buildImageSection(),
-                        const SizedBox(height: 24),
+                      _buildSectionTitle('Gambar Produk'),
+                      const SizedBox(height: 16),
+                      _buildImageSection(),
+                      const SizedBox(height: 24),
 
-                        _buildSectionTitle('Detail Produk'),
-                        const SizedBox(height: 16),
-                        _buildTextField(
-                          controller: _deskripsiLengkapController,
-                          label: 'Deskripsi Lengkap',
-                          hint: 'Jelaskan produk secara detail',
-                          maxLines: 4,
-                        ),
-                        const SizedBox(height: 16),
-                        _buildTextField(
-                          controller: _khasiatController,
-                          label: 'Khasiat',
-                          hint: 'Sebutkan manfaat produk',
-                          maxLines: 3,
-                        ),
-                        const SizedBox(height: 16),
-                        _buildTextField(
-                          controller: _kandunganController,
-                          label: 'Kandungan',
-                          hint: 'Bahan-bahan yang terkandung',
-                          maxLines: 3,
-                        ),
-                        const SizedBox(height: 16),
-                        _buildTextField(
-                          controller: _kemasanController,
-                          label: 'Kemasan',
-                          hint: 'Contoh: Botol 250ml',
-                        ),
-                        const SizedBox(height: 16),
-                        _buildTextField(
-                          controller: _aturanController,
-                          label: 'Aturan Pemakaian',
-                          hint: 'Cara menggunakan produk',
-                          maxLines: 3,
-                        ),
-                        const SizedBox(height: 16),
-                        _buildTextField(
-                          controller: _legalitasController,
-                          label: 'Legalitas',
-                          hint: 'Nomor PIRT, BPOM, dll',
-                        ),
-                        const SizedBox(height: 16),
-                        _buildTextField(
-                          controller: _informasiController,
-                          label: 'Informasi Penting',
-                          hint: 'Peringatan atau informasi tambahan',
-                          maxLines: 2,
-                        ),
-                        const SizedBox(height: 32),
+                      _buildSectionTitle('Detail Produk'),
+                      const SizedBox(height: 16),
+                      _buildTextField(
+                        controller: _deskripsiLengkapController,
+                        label: 'Deskripsi Lengkap',
+                        hint: 'Jelaskan produk secara detail',
+                        maxLines: 4,
+                      ),
+                      const SizedBox(height: 16),
+                      _buildTextField(
+                        controller: _khasiatController,
+                        label: 'Khasiat',
+                        hint: 'Sebutkan manfaat produk',
+                        maxLines: 3,
+                      ),
+                      const SizedBox(height: 16),
+                      _buildTextField(
+                        controller: _kandunganController,
+                        label: 'Kandungan',
+                        hint: 'Bahan-bahan yang terkandung',
+                        maxLines: 3,
+                      ),
+                      const SizedBox(height: 16),
+                      _buildTextField(
+                        controller: _kemasanController,
+                        label: 'Kemasan',
+                        hint: 'Contoh: Botol 250ml',
+                      ),
+                      const SizedBox(height: 16),
+                      _buildTextField(
+                        controller: _aturanController,
+                        label: 'Aturan Pemakaian',
+                        hint: 'Cara menggunakan produk',
+                        maxLines: 3,
+                      ),
+                      const SizedBox(height: 16),
+                      _buildTextField(
+                        controller: _legalitasController,
+                        label: 'Legalitas',
+                        hint: 'Nomor PIRT, BPOM, dll',
+                      ),
+                      const SizedBox(height: 16),
+                      _buildTextField(
+                        controller: _informasiController,
+                        label: 'Informasi Penting',
+                        hint: 'Peringatan atau informasi tambahan',
+                        maxLines: 2,
+                      ),
+                      const SizedBox(height: 32),
 
-                        SizedBox(
-                          width: double.infinity,
-                          height: 50,
-                          child: ElevatedButton(
-                            onPressed: (isLoading || _isUploadingImages)
-                                ? null
-                                : () => _submitForm(context),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.green[700],
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
+                      SizedBox(
+                        width: double.infinity,
+                        height: 50,
+                        child: ElevatedButton(
+                          onPressed: (isLoading || _isUploadingImages)
+                              ? null
+                              : () => _submitForm(context),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.green[700],
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
                             ),
-                            child: (isLoading || _isUploadingImages)
-                                ? const SizedBox(
-                                    height: 20,
-                                    width: 20,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                      valueColor: AlwaysStoppedAnimation<Color>(
-                                        Colors.white,
-                                      ),
-                                    ),
-                                  )
-                                : const Text(
-                                    'Simpan Produk',
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white,
+                          ),
+                          child: (isLoading || _isUploadingImages)
+                              ? const SizedBox(
+                                  height: 20,
+                                  width: 20,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    valueColor: AlwaysStoppedAnimation<Color>(
+                                      Colors.white,
                                     ),
                                   ),
-                          ),
+                                )
+                              : const Text(
+                                  'Simpan Produk',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                ),
                         ),
-                        const SizedBox(height: 24),
-                      ],
-                    ),
+                      ),
+                      const SizedBox(height: 24),
+                    ],
                   ),
                 ),
-              ],
-            );
-          },
-        ),
+              ),
+            ],
+          );
+        },
       ),
     );
   }

@@ -44,31 +44,40 @@ class Product {
 
   // Factory constructor untuk membuat objek dari Map (JSON dari Supabase)
   factory Product.fromJson(Map<String, dynamic> json) {
-    // Penanganan khusus untuk array/list
-    final List<dynamic>? imagesDynamic = json['image_url'];
-    final List<String>? images = imagesDynamic?.cast<String>();
+    int toInt(dynamic v) =>
+        v is int ? v : int.tryParse(v?.toString() ?? '') ?? 0;
 
-    final List<dynamic>? categoriesDynamic = json['kategori'];
-    final List<String>? categories = categoriesDynamic?.cast<String>();
+    DateTime toDate(dynamic v) {
+      if (v == null) return DateTime.fromMillisecondsSinceEpoch(0);
+      if (v is DateTime) return v;
+      return DateTime.tryParse(v.toString()) ??
+          DateTime.fromMillisecondsSinceEpoch(0);
+    }
+
+    List<String>? toStringList(dynamic v) {
+      if (v is List) {
+        return v.whereType<String>().toList();
+      }
+      return null;
+    }
 
     return Product(
-      id: json['id'] as int,
-      umkmId: json['umkm_id'] as String,
-      namaProduk: json['nama_produk'] as String,
-      harga: json['harga'] as int,
-      deskripsiSingkat: json['deskripsi_singkat'] as String?,
-      deskripsiLengkap: json['deskripsi_lengkap'] as String?,
-      khasiat: json['khasiat'] as String?,
-      kemasan: json['kemasan'] as String?,
-      aturanPemakaian: json['aturan_pemakaian'] as String?,
-      legalitas: json['legalitas'] as String?,
-      kandungan: json['kandungan'] as String?,
-      informasiPenting: json['informasi_penting'] as String?,
-      imageUrl: images,
-      kategori: categories,
-      // Supabase biasanya mengembalikan timestamp sebagai string
-      createdAt: DateTime.parse(json['created_at'] as String),
-      updatedAt: DateTime.parse(json['updated_at'] as String),
+      id: toInt(json['id']),
+      umkmId: json['umkm_id']?.toString() ?? '',
+      namaProduk: json['nama_produk']?.toString() ?? '',
+      harga: toInt(json['harga']),
+      deskripsiSingkat: json['deskripsi_singkat']?.toString(),
+      deskripsiLengkap: json['deskripsi_lengkap']?.toString(),
+      khasiat: json['khasiat']?.toString(),
+      kemasan: json['kemasan']?.toString(),
+      aturanPemakaian: json['aturan_pemakaian']?.toString(),
+      legalitas: json['legalitas']?.toString(),
+      kandungan: json['kandungan']?.toString(),
+      informasiPenting: json['informasi_penting']?.toString(),
+      imageUrl: toStringList(json['image_url']),
+      kategori: toStringList(json['kategori']),
+      createdAt: toDate(json['created_at']),
+      updatedAt: toDate(json['updated_at']),
     );
   }
 

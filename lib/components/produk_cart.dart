@@ -1,5 +1,9 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:herbal_app/Feature/product/bloc/product_bloc.dart';
 import 'package:herbal_app/Feature/product/ui/product_detail_view.dart';
+import 'package:herbal_app/core/dependecy_injector/service_locator.dart';
 import 'package:herbal_app/data/models/product_model.dart';
 
 class ProdukCart extends StatelessWidget {
@@ -14,9 +18,12 @@ class ProdukCart extends StatelessWidget {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => ProductDetailView(
-              product: product,
-              sellerUmkmId: product.umkmId,
+            builder: (context) => BlocProvider<ProductBloc>(
+              create: (context) => getIt<ProductBloc>(),
+              child: ProductDetailView(
+                product: product,
+                sellerUmkmId: product.umkmId,
+              ),
             ),
           ),
         );
@@ -51,10 +58,22 @@ class ProdukCart extends StatelessWidget {
                 child: product.imageUrl != null && product.imageUrl!.isNotEmpty
                     ? ClipRRect(
                         borderRadius: BorderRadius.circular(8),
-                        child: Image.network(
-                          product.imageUrl![0],
+                        child: CachedNetworkImage(
+                          imageUrl: product.imageUrl![0],
                           fit: BoxFit.cover,
+                          placeholder: (context, url) =>
+                              Center(child: CircularProgressIndicator()),
+                          errorWidget: (context, url, error) => Icon(
+                            Icons.broken_image,
+                            size: 50,
+                            color: Colors.grey,
+                          ),
                         ),
+
+                        // Image.network(
+                        //   product.imageUrl![0],
+                        //   fit: BoxFit.cover,
+                        // ),
                       )
                     : const Icon(Icons.image, size: 50, color: Colors.grey),
               ),

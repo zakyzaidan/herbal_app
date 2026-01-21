@@ -1,7 +1,5 @@
 // lib/data/models/slider_data.dart
 
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 
 class SliderData {

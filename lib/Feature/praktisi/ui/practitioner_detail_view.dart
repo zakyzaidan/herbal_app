@@ -7,8 +7,7 @@ import 'package:url_launcher/url_launcher.dart';
 class PractitionerDetailView extends StatelessWidget {
   final PractitionerProfile practitioner;
 
-  const PractitionerDetailView({Key? key, required this.practitioner})
-    : super(key: key);
+  const PractitionerDetailView({super.key, required this.practitioner});
 
   @override
   Widget build(BuildContext context) {

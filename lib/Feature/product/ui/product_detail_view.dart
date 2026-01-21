@@ -24,61 +24,58 @@ class _ProductDetailViewState extends State<ProductDetailView> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => ProductBloc(),
-      child: Scaffold(
-        backgroundColor: Colors.white,
-        body: SafeArea(
-          child: BlocListener<ProductBloc, ProductState>(
-            listener: (context, state) {
-              if (state is ProductDeletedSuccess) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Produk berhasil dihapus'),
-                    backgroundColor: Colors.green,
-                  ),
-                );
-                Navigator.of(context).pushAndRemoveUntil(
-                  MaterialPageRoute(builder: (_) => const MainNavigation()),
-                  (route) => false,
-                );
-              } else if (state is ProductError) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(state.message),
-                    backgroundColor: Colors.red,
-                  ),
-                );
-              }
-            },
-            child: Column(
-              children: [
-                Expanded(
-                  child: SingleChildScrollView(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _buildImageSection(),
-                        const SizedBox(height: 16),
-                        _buildCategoryBadge(),
-                        const SizedBox(height: 12),
-                        _buildProductTitle(),
-                        const SizedBox(height: 8),
-                        _buildPrice(),
-                        const SizedBox(height: 12),
-                        _buildShortDescription(),
-                        const SizedBox(height: 16),
-                        _buildSellerInfo(),
-                        const SizedBox(height: 16),
-                        _buildTabSection(),
-                        const SizedBox(height: 24),
-                      ],
-                    ),
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: SafeArea(
+        child: BlocListener<ProductBloc, ProductState>(
+          listener: (context, state) {
+            if (state is ProductDeletedSuccess) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Produk berhasil dihapus'),
+                  backgroundColor: Colors.green,
+                ),
+              );
+              Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(builder: (_) => const MainNavigation()),
+                (route) => false,
+              );
+            } else if (state is ProductError) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(state.message),
+                  backgroundColor: Colors.red,
+                ),
+              );
+            }
+          },
+          child: Column(
+            children: [
+              Expanded(
+                child: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildImageSection(),
+                      const SizedBox(height: 16),
+                      _buildCategoryBadge(),
+                      const SizedBox(height: 12),
+                      _buildProductTitle(),
+                      const SizedBox(height: 8),
+                      _buildPrice(),
+                      const SizedBox(height: 12),
+                      _buildShortDescription(),
+                      const SizedBox(height: 16),
+                      _buildSellerInfo(),
+                      const SizedBox(height: 16),
+                      _buildTabSection(),
+                      const SizedBox(height: 24),
+                    ],
                   ),
                 ),
-                _buildBottomBar(),
-              ],
-            ),
+              ),
+              _buildBottomBar(),
+            ],
           ),
         ),
       ),

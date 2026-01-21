@@ -5,7 +5,7 @@ import 'package:herbal_app/Feature/product/ui/form_create_product_view.dart';
 import 'package:herbal_app/main.dart';
 
 class SellerProfileFormScreen extends StatefulWidget {
-  const SellerProfileFormScreen({Key? key}) : super(key: key);
+  const SellerProfileFormScreen({super.key});
 
   @override
   State<SellerProfileFormScreen> createState() =>

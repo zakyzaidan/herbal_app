@@ -179,7 +179,6 @@ class AuthServices {
           .maybeSingle();
 
       if (userRole == null) {
-        print('User tidak memiliki role $roleName');
         return false;
       }
 
@@ -197,7 +196,6 @@ class AuthServices {
 
       return true;
     } catch (e) {
-      print('Error switching role: $e');
       return false;
     }
   }
@@ -224,7 +222,6 @@ class AuthServices {
           .maybeSingle();
 
       if (existing != null) {
-        print('User sudah memiliki role $roleName');
         return false;
       }
 
@@ -245,7 +242,6 @@ class AuthServices {
 
       return true;
     } catch (e) {
-      print('Error assigning role: $e');
       return false;
     }
   }

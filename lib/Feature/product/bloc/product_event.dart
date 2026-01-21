@@ -3,7 +3,11 @@ part of 'product_bloc.dart';
 @immutable
 sealed class ProductEvent {}
 
-class LoadAllProductsEvent extends ProductEvent {}
+class LoadAllProductsEvent extends ProductEvent {
+  final bool? forceRefresh;
+
+  LoadAllProductsEvent({this.forceRefresh});
+}
 
 class CreateProductEvent extends ProductEvent {
   final Product productInput;
@@ -13,8 +17,9 @@ class CreateProductEvent extends ProductEvent {
 
 class LoadProductsSellerEvent extends ProductEvent {
   final String umkmId;
+  final bool? forceRefresh;
 
-  LoadProductsSellerEvent(this.umkmId);
+  LoadProductsSellerEvent(this.umkmId, {this.forceRefresh});
 }
 
 class GetProductDetailEvent extends ProductEvent {

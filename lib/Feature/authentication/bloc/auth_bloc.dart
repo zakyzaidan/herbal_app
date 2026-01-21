@@ -152,17 +152,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         event.data,
         event.userId,
       );
-      final activeRole = await _authRepository.getActiveRole();
-      print('Role saat ini: ${activeRole?.roleName}');
 
       // Assign role penjual (user sekarang punya 2 role)
-      bool success = await _authRepository.assignRole(
-        'penjual',
-        setActive: true,
-      );
-      if (success) {
-        print('Berhasil upgrade ke penjual!');
-      }
+      await _authRepository.assignRole('penjual', setActive: true);
+
       emit(SellerProfileSuccess(profile));
     } catch (e) {
       emit(CreateProfileError(e.toString()));
@@ -179,17 +172,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         event.data,
         event.userId,
       );
-      final activeRole = await _authRepository.getActiveRole();
-      print('Role saat ini: ${activeRole?.roleName}');
 
       // Assign role praktisi (user sekarang punya 2 role)
-      bool success = await _authRepository.assignRole(
-        'praktisi',
-        setActive: true,
-      );
-      if (success) {
-        print('Berhasil upgrade ke praktisi!');
-      }
+      await _authRepository.assignRole('praktisi', setActive: true);
       emit(PractitionerProfileSuccess(profile));
     } catch (e) {
       emit(CreateProfileError(e.toString()));

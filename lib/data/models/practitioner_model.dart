@@ -57,28 +57,41 @@ class PractitionerProfile {
   });
 
   factory PractitionerProfile.fromJson(Map<String, dynamic> json) {
-    final List<dynamic>? servicesDynamic = json['services'];
-    final List<String>? services = servicesDynamic?.cast<String>();
+    String toString(dynamic v) => v?.toString() ?? '';
+
+    DateTime toDate(dynamic v) {
+      if (v == null) return DateTime.fromMillisecondsSinceEpoch(0);
+      if (v is DateTime) return v;
+      return DateTime.tryParse(v.toString()) ??
+          DateTime.fromMillisecondsSinceEpoch(0);
+    }
+
+    List<String>? toStringList(dynamic v) {
+      if (v is List) {
+        return v.whereType<String>().toList();
+      }
+      return null;
+    }
 
     return PractitionerProfile(
-      id: json['id'] as String,
-      userId: json['user_id'] as String,
-      fullName: json['full_name'] as String,
-      title: json['title'] as String,
-      educationHistory: json['education_history'] as String?,
-      trainingInstitution: json['training_institution'] as String?,
-      practiceName: json['practice_name'] as String?,
-      practiceAddress: json['practice_address'] as String?,
-      city: json['city'] as String?,
-      province: json['province'] as String?,
-      certificationNumber: json['certification_number'] as String?,
-      services: services,
-      description: json['description'] as String?,
-      whatsappNumber: json['whatsapp_number'] as String?,
-      socialMediaUrl: json['social_media_url'] as String?,
-      profilePhoto: json['profile_photo'] as String?,
-      createdAt: DateTime.parse(json['created_at'] as String),
-      updatedAt: DateTime.parse(json['updated_at'] as String),
+      id: toString(json['id']),
+      userId: toString(json['user_id']),
+      fullName: toString(json['full_name']),
+      title: toString(json['title']),
+      educationHistory: json['education_history']?.toString(),
+      trainingInstitution: json['training_institution']?.toString(),
+      practiceName: json['practice_name']?.toString(),
+      practiceAddress: json['practice_address']?.toString(),
+      city: json['city']?.toString(),
+      province: json['province']?.toString(),
+      certificationNumber: json['certification_number']?.toString(),
+      services: toStringList(json['services']),
+      description: json['description']?.toString(),
+      whatsappNumber: json['whatsapp_number']?.toString(),
+      socialMediaUrl: json['social_media_url']?.toString(),
+      profilePhoto: json['profile_photo']?.toString(),
+      createdAt: toDate(json['created_at']),
+      updatedAt: toDate(json['updated_at']),
     );
   }
 

@@ -20,14 +20,15 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     // Load data ketika screen pertama kali dibuka
-    context.read<HomeBloc>().add(LoadHomeDataEvent());
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.grey[50],
-      body: SafeArea(
+    return RefreshIndicator(
+      onRefresh: () async {
+        context.read<HomeBloc>().add(LoadHomeDataEvent(forceRefresh: true));
+      },
+      child: SafeArea(
         child: SingleChildScrollView(
           child: Column(
             children: [
@@ -117,7 +118,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             ElevatedButton(
                               onPressed: () {
                                 context.read<HomeBloc>().add(
-                                  LoadHomeDataEvent(),
+                                  LoadHomeDataEvent(forceRefresh: true),
                                 );
                               },
                               child: const Text('Coba Lagi'),
