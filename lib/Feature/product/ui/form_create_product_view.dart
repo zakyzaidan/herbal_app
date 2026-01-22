@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:herbal_app/Feature/product/bloc/product_bloc.dart';
 import 'package:herbal_app/data/models/product_model.dart';
 import 'package:herbal_app/data/services/supabase_storage_services.dart';
-import 'package:herbal_app/main_navigation.dart';
 import 'package:image_picker/image_picker.dart';
 
 class ProductFormScreen extends StatefulWidget {
@@ -11,10 +11,10 @@ class ProductFormScreen extends StatefulWidget {
   final bool isFirstProduct;
 
   const ProductFormScreen({
-    Key? key,
+    super.key,
     required this.umkmId,
     this.isFirstProduct = false,
-  }) : super(key: key);
+  });
 
   @override
   State<ProductFormScreen> createState() => _ProductFormScreenState();
@@ -37,7 +37,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
   final _informasiController = TextEditingController();
   final _kategoriController = TextEditingController();
 
-  List<String> _imageUrls = [];
+  final List<String> _imageUrls = [];
   bool _isUploadingImages = false;
 
   @override
@@ -108,7 +108,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () => Navigator.pop(context),
+          onPressed: () => context.pop(),
         ),
         title: const Text(
           'Tambah Produk',
@@ -472,9 +472,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
         updatedAt: DateTime.now(),
       );
 
-      context.read<ProductBloc>().add(
-        CreateProductEvent(productInput: product),
-      );
+      context.read<ProductBloc>().add(CreateProductEvent(product: product));
     }
   }
 
@@ -539,12 +537,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                       Navigator.of(context).pop(); // Close dialog
                       if (widget.isFirstProduct) {
                         // Jika ini produk pertama, kembali ke home
-                        Navigator.of(context).pushAndRemoveUntil(
-                          MaterialPageRoute(
-                            builder: (context) => const MainNavigation(),
-                          ),
-                          (route) => false,
-                        );
+                        context.go('/main');
                       } else {
                         Navigator.of(context).pop(); // Close form
                       }

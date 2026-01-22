@@ -1,11 +1,9 @@
 // lib/Feature/settings/ui/settings_view.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:herbal_app/Feature/authentication/bloc/auth_bloc.dart';
-import 'package:herbal_app/Feature/authentication/ui/form_create_practitioner.dart';
-import 'package:herbal_app/Feature/authentication/ui/login_view.dart';
 import 'package:herbal_app/Feature/settings/bloc/settings_bloc.dart';
-import 'package:herbal_app/Feature/authentication/ui/form_create_seller.dart';
 import 'package:herbal_app/data/models/user_model.dart';
 
 // Models
@@ -27,7 +25,7 @@ class SettingsMenuItem {
 
 // Settings Screen
 class SettingsView extends StatefulWidget {
-  const SettingsView({Key? key}) : super(key: key);
+  const SettingsView({super.key});
 
   @override
   State<SettingsView> createState() => _SettingsViewState();
@@ -45,7 +43,7 @@ class _SettingsViewState extends State<SettingsView> {
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () => Navigator.pop(context),
+          onPressed: () => context.pop(),
         ),
         title: const Text(
           'Settings',
@@ -247,7 +245,7 @@ class _SettingsViewState extends State<SettingsView> {
         content: const Text('Apakah Anda yakin ingin keluar dari akun?'),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => context.pop(),
             child: const Text('Batal'),
           ),
           TextButton(
@@ -256,14 +254,7 @@ class _SettingsViewState extends State<SettingsView> {
               ScaffoldMessenger.of(
                 context,
               ).showSnackBar(const SnackBar(content: Text('Berhasil keluar')));
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                  builder: (context) {
-                    return const LoginPage();
-                  },
-                ),
-              );
+              context.go('auth/login');
             },
             child: const Text('Keluar', style: TextStyle(color: Colors.red)),
           ),
@@ -294,15 +285,14 @@ class _SettingsViewState extends State<SettingsView> {
 class RoleSelectionBottomSheet extends StatelessWidget {
   final AuthBloc authBloc;
 
-  const RoleSelectionBottomSheet({Key? key, required this.authBloc})
-    : super(key: key);
+  const RoleSelectionBottomSheet({super.key, required this.authBloc});
 
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<SettingsBloc, SettingsState>(
       listener: (context, state) {
         if (state is RoleSwitchSuccess) {
-          Navigator.pop(context);
+          context.pop();
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text('Berhasil switch ke role ${state.roleName}'),
@@ -432,16 +422,8 @@ class RoleSelectionBottomSheet extends StatelessWidget {
             title: 'Buat Akun Penjual',
             subtitle: 'Daftar sebagai penjual produk herbal',
             onTap: () {
-              Navigator.pop(context);
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => BlocProvider.value(
-                    value: authBloc,
-                    child: const SellerProfileFormScreen(),
-                  ),
-                ),
-              );
+              context.pop();
+              context.go('/register-seller');
             },
           ),
         );
@@ -470,16 +452,8 @@ class RoleSelectionBottomSheet extends StatelessWidget {
             title: 'Buat Akun Praktisi Herbal',
             subtitle: 'Daftar sebagai praktisi herbal',
             onTap: () {
-              Navigator.pop(context);
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => BlocProvider.value(
-                    value: authBloc,
-                    child: const PractitionerProfileFormScreen(),
-                  ),
-                ),
-              );
+              context.pop();
+              context.go('/register-practitioner');
             },
           ),
         );
@@ -523,16 +497,8 @@ class RoleSelectionBottomSheet extends StatelessWidget {
             title: 'Buat Akun Praktisi Herbal',
             subtitle: 'Daftar sebagai praktisi herbal',
             onTap: () {
-              Navigator.pop(context);
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => BlocProvider.value(
-                    value: authBloc,
-                    child: const PractitionerProfileFormScreen(),
-                  ),
-                ),
-              );
+              context.pop();
+              context.go('/register-practitioner');
             },
           ),
         );
@@ -576,16 +542,8 @@ class RoleSelectionBottomSheet extends StatelessWidget {
             title: 'Buat Akun Penjual',
             subtitle: 'Daftar sebagai penjual produk herbal',
             onTap: () {
-              Navigator.pop(context);
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => BlocProvider.value(
-                    value: authBloc,
-                    child: const SellerProfileFormScreen(),
-                  ),
-                ),
-              );
+              context.pop();
+              context.go('/register-seller');
             },
           ),
         );

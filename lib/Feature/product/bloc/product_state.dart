@@ -10,7 +10,7 @@ class ProductLoading extends ProductState {}
 class ProductDeletedSuccess extends ProductState {}
 
 class AllProductsLoaded extends ProductState {
-  final List<Product> products;
+  final List<ProductCartModel> products;
   final List<String> categories;
 
   AllProductsLoaded(this.products, this.categories);
@@ -23,15 +23,17 @@ class ProductCreatedSuccess extends ProductState {
 }
 
 class ProductsSellerLoaded extends ProductState {
-  final List<Product> products;
+  final List<ProductCartModel> products;
 
   ProductsSellerLoaded(this.products);
 }
 
 class ProductDetailLoaded extends ProductState {
   final Product product;
+  final SellerProfile seller;
+  final bool isOwner;
 
-  ProductDetailLoaded(this.product);
+  ProductDetailLoaded(this.product, this.seller, this.isOwner);
 }
 
 class ProductUpdatedSuccess extends ProductState {

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:herbal_app/Feature/authentication/bloc/auth_bloc.dart';
-import 'package:herbal_app/Feature/product/ui/form_create_product_view.dart';
 import 'package:herbal_app/main.dart';
 
 class SellerProfileFormScreen extends StatefulWidget {
@@ -51,7 +51,7 @@ class _SellerProfileFormScreenState extends State<SellerProfileFormScreen> {
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () => Navigator.pop(context),
+          onPressed: () => context.pop(),
         ),
         title: const Text(
           'Daftar Akun Penjual',
@@ -377,13 +377,9 @@ class _SellerProfileFormScreenState extends State<SellerProfileFormScreen> {
               child: ElevatedButton(
                 onPressed: () {
                   Navigator.of(context).pop(); // Close dialog
-                  Navigator.of(context).pushReplacement(
-                    MaterialPageRoute(
-                      builder: (context) => ProductFormScreen(
-                        umkmId: sellerId,
-                        isFirstProduct: true,
-                      ),
-                    ),
+                  context.go(
+                    '/product_form',
+                    extra: {'umkmId': sellerId, 'isFirstProduct': true},
                   );
                 },
                 style: ElevatedButton.styleFrom(

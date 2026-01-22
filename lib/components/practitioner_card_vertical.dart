@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:herbal_app/Feature/praktisi/ui/practitioner_detail_view.dart';
+import 'package:go_router/go_router.dart';
 import 'package:herbal_app/data/models/practitioner_model.dart';
 
 class PractitionerCardVertical extends StatelessWidget {
@@ -11,13 +11,7 @@ class PractitionerCardVertical extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) =>
-                PractitionerDetailView(practitioner: practitioner),
-          ),
-        );
+        context.push("/practitioners/${practitioner.id}", extra: practitioner);
       },
       child: Container(
         padding: const EdgeInsets.all(12),
@@ -26,8 +20,8 @@ class PractitionerCardVertical extends StatelessWidget {
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.08),
-              blurRadius: 8,
+              color: Color(0x3F000000),
+              blurRadius: 4,
               offset: const Offset(0, 2),
             ),
           ],

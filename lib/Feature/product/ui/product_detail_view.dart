@@ -1,17 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:herbal_app/Feature/authentication/bloc/auth_bloc.dart';
 import 'package:herbal_app/Feature/product/bloc/product_bloc.dart';
-import 'package:herbal_app/Feature/product/ui/form_edit_product_view.dart';
 import 'package:herbal_app/data/models/product_model.dart';
-import 'package:herbal_app/main_navigation.dart';
+import 'package:herbal_app/data/models/seller_model.dart';
 
 class ProductDetailView extends StatefulWidget {
-  final Product product;
-  final String? sellerUmkmId; // ID UMKM pemilik produk
-
-  const ProductDetailView({Key? key, required this.product, this.sellerUmkmId})
-    : super(key: key);
+  const ProductDetailView({super.key});
 
   @override
   State<ProductDetailView> createState() => _ProductDetailViewState();
@@ -27,8 +23,8 @@ class _ProductDetailViewState extends State<ProductDetailView> {
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
-        child: BlocListener<ProductBloc, ProductState>(
-          listener: (context, state) {
+        child: BlocBuilder<ProductBloc, ProductState>(
+          builder: (context, state) {
             if (state is ProductDeletedSuccess) {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
@@ -36,10 +32,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                   backgroundColor: Colors.green,
                 ),
               );
-              Navigator.of(context).pushAndRemoveUntil(
-                MaterialPageRoute(builder: (_) => const MainNavigation()),
-                (route) => false,
-              );
+              context.go('/main');
             } else if (state is ProductError) {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
@@ -47,44 +40,50 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                   backgroundColor: Colors.red,
                 ),
               );
-            }
-          },
-          child: Column(
-            children: [
-              Expanded(
-                child: SingleChildScrollView(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _buildImageSection(),
-                      const SizedBox(height: 16),
-                      _buildCategoryBadge(),
-                      const SizedBox(height: 12),
-                      _buildProductTitle(),
-                      const SizedBox(height: 8),
-                      _buildPrice(),
-                      const SizedBox(height: 12),
-                      _buildShortDescription(),
-                      const SizedBox(height: 16),
-                      _buildSellerInfo(),
-                      const SizedBox(height: 16),
-                      _buildTabSection(),
-                      const SizedBox(height: 24),
-                    ],
+            } else if (state is ProductDetailLoaded) {
+              final Product product = state.product;
+              final SellerProfile seller = state.seller;
+
+              return Column(
+                children: [
+                  Expanded(
+                    child: SingleChildScrollView(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _buildImageSection(product.imageUrl ?? []),
+                          const SizedBox(height: 16),
+                          _buildProductTitle(product.namaProduk),
+                          const SizedBox(height: 8),
+                          _buildPrice(product.harga),
+                          const SizedBox(height: 12),
+                          _buildCategoryBadge(product.kategori ?? []),
+                          const SizedBox(height: 12),
+                          _buildShortDescription(
+                            product.deskripsiSingkat ?? '',
+                          ),
+                          const SizedBox(height: 16),
+                          _buildSellerInfo(seller),
+                          const SizedBox(height: 16),
+                          _buildTabSection(product),
+                          const SizedBox(height: 24),
+                        ],
+                      ),
+                    ),
                   ),
-                ),
-              ),
-              _buildBottomBar(),
-            ],
-          ),
+                  _buildBottomBar(product, state.isOwner),
+                ],
+              );
+            }
+
+            return const Center(child: CircularProgressIndicator());
+          },
         ),
       ),
     );
   }
 
-  Widget _buildImageSection() {
-    final images = widget.product.imageUrl ?? [];
-
+  Widget _buildImageSection(List<String> images) {
     return Stack(
       children: [
         SizedBox(
@@ -134,7 +133,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
             ),
             child: IconButton(
               icon: const Icon(Icons.close, color: Colors.black),
-              onPressed: () => Navigator.pop(context),
+              onPressed: () => context.pop(),
             ),
           ),
         ),
@@ -184,42 +183,46 @@ class _ProductDetailViewState extends State<ProductDetailView> {
     );
   }
 
-  Widget _buildCategoryBadge() {
+  Widget _buildCategoryBadge(List<String> categories) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-        decoration: BoxDecoration(
-          color: Colors.green[50],
-          borderRadius: BorderRadius.circular(20),
-        ),
-        child: Text(
-          widget.product.kategori?.first ?? 'FITOFARMAKA',
-          style: TextStyle(
-            color: Colors.green[700],
-            fontSize: 12,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
+      child: Row(
+        children: categories.map((kategori) {
+          return Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            decoration: BoxDecoration(
+              color: Colors.green[50],
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Text(
+              kategori,
+              style: TextStyle(
+                color: Colors.green[700],
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          );
+        }).toList(),
       ),
     );
   }
 
-  Widget _buildProductTitle() {
+  Widget _buildProductTitle(String namaProduk) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24),
       child: Text(
-        widget.product.namaProduk,
+        namaProduk,
         style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
       ),
     );
   }
 
-  Widget _buildPrice() {
+  Widget _buildPrice(int harga) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24),
       child: Text(
-        'Rp ${_formatPrice(widget.product.harga)}',
+        'Rp ${_formatPrice(harga)}',
         style: TextStyle(
           fontSize: 20,
           fontWeight: FontWeight.bold,
@@ -229,19 +232,18 @@ class _ProductDetailViewState extends State<ProductDetailView> {
     );
   }
 
-  Widget _buildShortDescription() {
-    if (widget.product.deskripsiSingkat == null) return const SizedBox();
-
+  Widget _buildShortDescription(String deskripsiSingkat) {
+    if (deskripsiSingkat == '') return const SizedBox();
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24),
       child: Text(
-        widget.product.deskripsiSingkat!,
+        deskripsiSingkat,
         style: TextStyle(fontSize: 14, color: Colors.grey[700], height: 1.5),
       ),
     );
   }
 
-  Widget _buildSellerInfo() {
+  Widget _buildSellerInfo(SellerProfile seller) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24),
       child: Row(
@@ -252,18 +254,21 @@ class _ProductDetailViewState extends State<ProductDetailView> {
             child: const Icon(Icons.store, color: Colors.white),
           ),
           const SizedBox(width: 12),
-          const Expanded(
+          Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Toko Herbal Sehat Nusantara',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                  seller.businessName,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
-                SizedBox(height: 4),
+                const SizedBox(height: 4),
                 Text(
-                  '10 Produk  |  7 Postingan',
-                  style: TextStyle(fontSize: 12, color: Colors.grey),
+                  '${seller.productsServices?.length} Produk',
+                  style: const TextStyle(fontSize: 12, color: Colors.grey),
                 ),
               ],
             ),
@@ -273,7 +278,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
     );
   }
 
-  Widget _buildTabSection() {
+  Widget _buildTabSection(Product product) {
     return Column(
       children: [
         _buildExpandableSection(
@@ -287,12 +292,12 @@ class _ProductDetailViewState extends State<ProductDetailView> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              if (widget.product.deskripsiLengkap != null) ...[
+              if (product.deskripsiLengkap != null) ...[
                 const SizedBox(height: 16),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 24),
                   child: Text(
-                    widget.product.deskripsiLengkap!,
+                    product.deskripsiLengkap!,
                     style: TextStyle(
                       fontSize: 14,
                       color: Colors.grey[700],
@@ -304,7 +309,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
               const SizedBox(height: 8),
               Divider(height: 1, color: Colors.grey[300]),
               const SizedBox(height: 8),
-              _buildDetailTable(),
+              _buildDetailTable(product),
             ],
           ),
         ),
@@ -317,7 +322,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
               _isInfoExpanded = !_isInfoExpanded;
             });
           },
-          child: widget.product.informasiPenting != null
+          child: product.informasiPenting != null
               ? Container(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 24,
@@ -325,7 +330,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                   ),
                   alignment: Alignment.topLeft,
                   child: Text(
-                    widget.product.informasiPenting!,
+                    product.informasiPenting!,
                     style: TextStyle(
                       fontSize: 14,
                       color: Colors.grey[700],
@@ -380,19 +385,19 @@ class _ProductDetailViewState extends State<ProductDetailView> {
     );
   }
 
-  Widget _buildDetailTable() {
+  Widget _buildDetailTable(Product product) {
     final details = [
-      {'label': 'Nama Produk', 'value': widget.product.namaProduk},
-      if (widget.product.khasiat != null)
-        {'label': 'Khasiat', 'value': widget.product.khasiat!},
-      if (widget.product.kemasan != null)
-        {'label': 'Kemasan', 'value': widget.product.kemasan!},
-      if (widget.product.aturanPemakaian != null)
-        {'label': 'Aturan Pakai', 'value': widget.product.aturanPemakaian!},
-      if (widget.product.legalitas != null)
-        {'label': 'Legalitas', 'value': widget.product.legalitas!},
-      if (widget.product.kandungan != null)
-        {'label': 'Kandungan', 'value': widget.product.kandungan!},
+      {'label': 'Nama Produk', 'value': product.namaProduk},
+      if (product.khasiat != null)
+        {'label': 'Khasiat', 'value': product.khasiat!},
+      if (product.kemasan != null)
+        {'label': 'Kemasan', 'value': product.kemasan!},
+      if (product.aturanPemakaian != null)
+        {'label': 'Aturan Pakai', 'value': product.aturanPemakaian!},
+      if (product.legalitas != null)
+        {'label': 'Legalitas', 'value': product.legalitas!},
+      if (product.kandungan != null)
+        {'label': 'Kandungan', 'value': product.kandungan!},
     ];
 
     return Padding(
@@ -425,11 +430,9 @@ class _ProductDetailViewState extends State<ProductDetailView> {
     );
   }
 
-  Widget _buildBottomBar() {
+  Widget _buildBottomBar(Product product, bool isOwner) {
     return BlocBuilder<AuthBloc, AuthState>(
       builder: (context, authState) {
-        final isOwner = _checkIfOwner(authState);
-
         return Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
@@ -483,7 +486,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
               if (isOwner) ...[
                 const SizedBox(height: 12),
                 OutlinedButton(
-                  onPressed: () => _showProductOptions(context),
+                  onPressed: () => _showProductOptions(context, product),
                   style: OutlinedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(
@@ -515,19 +518,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
     );
   }
 
-  bool _checkIfOwner(AuthState authState) {
-    if (authState is! AuthAuthenticated) return false;
-    if (widget.sellerUmkmId == null) return false;
-
-    // Check if user is seller and product belongs to them
-    final isSellerRole = authState.user.isRoleActive('penjual');
-    // TODO: Compare with actual user's UMKM ID from seller profile
-    return isSellerRole;
-  }
-
-  void _showProductOptions(BuildContext context) {
-    final productBloc = context.read<ProductBloc>();
-
+  void _showProductOptions(BuildContext context, Product product) {
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.white,
@@ -564,17 +555,9 @@ class _ProductDetailViewState extends State<ProductDetailView> {
               subtitle: 'Ubah informasi produk',
               onTap: () {
                 Navigator.pop(bottomSheetContext);
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => BlocProvider.value(
-                      value: productBloc,
-                      child: ProductEditFormScreen(
-                        product: widget.product,
-                        umkmId: widget.product.umkmId,
-                      ),
-                    ),
-                  ),
+                context.push(
+                  '/products/${product.id}/edit',
+                  extra: {'product': product, 'umkmId': product.umkmId},
                 );
               },
             ),
@@ -588,7 +571,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
               iconColor: Colors.red,
               onTap: () async {
                 Navigator.pop(bottomSheetContext);
-                _showDeleteConfirmation(context);
+                _showDeleteConfirmation(context, product);
               },
             ),
             const SizedBox(height: 24),
@@ -658,7 +641,10 @@ class _ProductDetailViewState extends State<ProductDetailView> {
     );
   }
 
-  Future<dynamic> _showDeleteConfirmation(BuildContext context) {
+  Future<dynamic> _showDeleteConfirmation(
+    BuildContext context,
+    Product product,
+  ) {
     return showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
@@ -675,9 +661,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
           TextButton(
             onPressed: () {
               Navigator.pop(context);
-              context.read<ProductBloc>().add(
-                DeleteProductEvent(widget.product.id.toString()),
-              );
+              context.read<ProductBloc>().add(DeleteProductEvent(product.id));
             },
             child: Text('Hapus', style: const TextStyle(color: Colors.red)),
           ),

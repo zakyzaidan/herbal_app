@@ -2,10 +2,10 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:herbal_app/Feature/authentication/bloc/auth_bloc.dart';
 import 'package:herbal_app/data/services/supabase_storage_services.dart';
 import 'package:herbal_app/main.dart';
-import 'package:herbal_app/main_navigation.dart';
 import 'package:image_picker/image_picker.dart';
 
 class PractitionerProfileFormScreen extends StatefulWidget {
@@ -108,7 +108,7 @@ class _PractitionerProfileFormScreenState
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () => Navigator.pop(context),
+          onPressed: () => context.pop(),
         ),
         title: const Text(
           'Daftar Akun Praktisi',
@@ -518,12 +518,7 @@ class _PractitionerProfileFormScreenState
               child: ElevatedButton(
                 onPressed: () {
                   Navigator.of(context).pop();
-                  Navigator.of(context).pushAndRemoveUntil(
-                    MaterialPageRoute(
-                      builder: (context) => const MainNavigation(),
-                    ),
-                    (route) => false,
-                  );
+                  context.go('/main');
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.green[700],

@@ -6,17 +6,15 @@ import 'package:go_router/go_router.dart';
 import 'package:stylish_bottom_bar/stylish_bottom_bar.dart';
 
 class BottomNavigation extends StatefulWidget {
-  final Widget child;
+  final StatefulNavigationShell navshell;
 
-  const BottomNavigation({super.key, required this.child});
+  const BottomNavigation({super.key, required this.navshell});
 
   @override
   State<BottomNavigation> createState() => _BottomNavigationState();
 }
 
 class _BottomNavigationState extends State<BottomNavigation> {
-  int _selectedIndex = 0;
-
   final List<NavigationItem> _navigationItems = [
     NavigationItem(
       route: '/home',
@@ -46,33 +44,11 @@ class _BottomNavigationState extends State<BottomNavigation> {
   ];
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    _updateSelectedIndex();
-  }
-
-  void _updateSelectedIndex() {
-    final location = GoRouterState.of(context).uri.toString();
-    final index = _navigationItems.indexWhere(
-      (item) => location.startsWith(item.route),
-    );
-    if (index != -1 && index != _selectedIndex) {
-      setState(() => _selectedIndex = index);
-    }
-  }
-
-  void _onItemTapped(int index) {
-    if (index != _selectedIndex) {
-      context.go(_navigationItems[index].route);
-      setState(() => _selectedIndex = index);
-    }
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: widget.child,
+      body: widget.navshell,
       bottomNavigationBar: StylishBottomBar(
+        currentIndex: widget.navshell.currentIndex,
         option: AnimatedBarOptions(iconStyle: IconStyle.animated),
         items: _navigationItems.map((item) {
           return BottomBarItem(
@@ -89,8 +65,9 @@ class _BottomNavigationState extends State<BottomNavigation> {
             title: Text(item.label),
           );
         }).toList(),
-        currentIndex: _selectedIndex,
-        onTap: _onItemTapped,
+        onTap: (index) {
+          widget.navshell.goBranch(index);
+        },
       ),
     );
   }

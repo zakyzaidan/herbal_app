@@ -6,8 +6,6 @@ import 'package:herbal_app/Feature/home/bloc/home_bloc.dart';
 import 'package:herbal_app/Feature/praktisi/bloc/praktisi_bloc.dart';
 import 'package:herbal_app/Feature/product/bloc/product_bloc.dart';
 import 'package:herbal_app/core/router/app_router.dart';
-import 'package:herbal_app/data/repositories/practitioner_repository.dart';
-import 'package:herbal_app/data/repositories/product_repository.dart';
 import 'package:herbal_app/data/services/auth_services.dart';
 import 'package:herbal_app/data/services/practitioner_services.dart';
 import 'package:herbal_app/data/services/seller_services.dart';
@@ -27,19 +25,6 @@ Future<void> setupServiceLocator() async {
     () => PractitionerServices(),
   );
 
-  // ========== Repositories (Singleton) ==========
-  getIt.registerLazySingleton<ProductRepository>(
-    () =>
-        ProductRepository(getIt<SellerServices>(), getIt<SharedPreferences>()),
-  );
-
-  getIt.registerLazySingleton<PractitionerRepository>(
-    () => PractitionerRepository(
-      getIt<PractitionerServices>(),
-      getIt<SharedPreferences>(),
-    ),
-  );
-
   // ========== BLoCs ==========
 
   // AuthBloc - Singleton (shared across app)
@@ -48,17 +33,11 @@ Future<void> setupServiceLocator() async {
   );
 
   // Other BLoCs - Factory (new instance setiap kali dipanggil)
-  getIt.registerFactory<ProductBloc>(
-    () => ProductBloc(getIt<ProductRepository>()),
-  );
+  getIt.registerFactory<ProductBloc>(() => ProductBloc());
 
-  getIt.registerFactory<HomeBloc>(
-    () => HomeBloc(getIt<ProductRepository>(), getIt<PractitionerRepository>()),
-  );
+  getIt.registerFactory<HomeBloc>(() => HomeBloc());
 
-  getIt.registerFactory<PraktisiBloc>(
-    () => PraktisiBloc(getIt<PractitionerRepository>()),
-  );
+  getIt.registerFactory<PraktisiBloc>(() => PraktisiBloc());
 
   // ========== Router (Singleton) ==========
   getIt.registerLazySingleton<AppRouter>(() => AppRouter(getIt<AuthBloc>()));

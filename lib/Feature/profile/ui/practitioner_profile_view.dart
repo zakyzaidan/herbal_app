@@ -1,13 +1,11 @@
 // lib/Feature/profile/ui/practitioner_profile_view_complete.dart
 
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:herbal_app/Feature/profile/ui/form_edit_practitioner.dart';
-import 'package:herbal_app/Feature/settings/ui/settings_view.dart';
 import 'package:herbal_app/data/models/practitioner_model.dart';
 import 'package:herbal_app/data/models/user_model.dart';
 import 'package:herbal_app/data/services/practitioner_services.dart';
-
-import 'package:herbal_app/Feature/praktisi/ui/practitioner_detail_view.dart';
 
 class PractitionerProfileView extends StatefulWidget {
   final UserModel user;
@@ -121,10 +119,7 @@ class _PractitionerProfileViewState extends State<PractitionerProfileView>
               IconButton(
                 icon: const Icon(Icons.settings_outlined, color: Colors.white),
                 onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const SettingsView()),
-                  );
+                  context.push('/settings');
                 },
               ),
             ],
@@ -262,17 +257,11 @@ class _PractitionerProfileViewState extends State<PractitionerProfileView>
                 child: OutlinedButton.icon(
                   onPressed: () async {
                     if (_practitionerProfile != null) {
-                      final updated = await Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => PractitionerDetailView(
-                            practitioner: _practitionerProfile!,
-                          ),
-                        ),
+                      context.push(
+                        '/practitioner/${_practitionerProfile!.id}',
+                        extra: _practitionerProfile,
                       );
-                      if (updated != null) {
-                        _loadPractitionerData();
-                      }
+                      _loadPractitionerData();
                     }
                   },
                   icon: const Icon(Icons.visibility),

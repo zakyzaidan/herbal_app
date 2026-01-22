@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:herbal_app/Feature/product/bloc/product_bloc.dart';
 import 'package:herbal_app/data/models/product_model.dart';
 import 'package:herbal_app/data/services/supabase_storage_services.dart';
@@ -10,10 +11,10 @@ class ProductEditFormScreen extends StatefulWidget {
   final String umkmId;
 
   const ProductEditFormScreen({
-    Key? key,
+    super.key,
     required this.product,
     required this.umkmId,
-  }) : super(key: key);
+  });
 
   @override
   State<ProductEditFormScreen> createState() => _ProductEditFormScreenState();
@@ -148,7 +149,7 @@ class _ProductEditFormScreenState extends State<ProductEditFormScreen> {
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () => Navigator.pop(context),
+          onPressed: () => context.pop(),
         ),
         title: const Text(
           'Edit Produk',
@@ -168,7 +169,7 @@ class _ProductEditFormScreenState extends State<ProductEditFormScreen> {
                 backgroundColor: Colors.green,
               ),
             );
-            Navigator.pop(context, state.product);
+            context.pop();
           } else if (state is ProductError) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
@@ -511,7 +512,7 @@ class _ProductEditFormScreenState extends State<ProductEditFormScreen> {
       );
 
       context.read<ProductBloc>().add(
-        UpdateProductEvent(widget.product.id.toString(), updatedProduct),
+        UpdateProductEvent(widget.product.id, updatedProduct),
       );
     }
   }

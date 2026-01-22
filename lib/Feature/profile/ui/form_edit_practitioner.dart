@@ -1,6 +1,7 @@
 // lib/Feature/praktisi/ui/form_edit_practitioner.dart
 
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:herbal_app/data/models/practitioner_model.dart';
 import 'package:herbal_app/data/services/practitioner_services.dart';
 import 'package:herbal_app/data/services/supabase_storage_services.dart';
@@ -9,8 +10,7 @@ import 'package:image_picker/image_picker.dart';
 class PractitionerEditFormScreen extends StatefulWidget {
   final PractitionerProfile profile;
 
-  const PractitionerEditFormScreen({Key? key, required this.profile})
-    : super(key: key);
+  const PractitionerEditFormScreen({super.key, required this.profile});
 
   @override
   State<PractitionerEditFormScreen> createState() =>
@@ -205,7 +205,7 @@ class _PractitionerEditFormScreenState
               backgroundColor: Colors.green,
             ),
           );
-          Navigator.pop(context, updatedProfile);
+          context.pop(updatedProfile);
         }
       } catch (e) {
         if (mounted) {
@@ -233,7 +233,7 @@ class _PractitionerEditFormScreenState
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () => Navigator.pop(context),
+          onPressed: () => context.pop(),
         ),
         title: const Text(
           'Edit Profil Praktisi',

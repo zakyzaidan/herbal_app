@@ -29,7 +29,6 @@ class RoleService {
         rolesData: List<Map<String, dynamic>>.from(roles),
       );
     } catch (e) {
-      print('Error: $e');
       return null;
     }
   }
@@ -61,7 +60,6 @@ class RoleService {
           .maybeSingle();
 
       if (userRole == null) {
-        print('User tidak memiliki role $roleName');
         return false;
       }
 
@@ -79,7 +77,6 @@ class RoleService {
 
       return true;
     } catch (e) {
-      print('Error: $e');
       return false;
     }
   }
@@ -105,7 +102,6 @@ class RoleService {
           .maybeSingle();
 
       if (existing != null) {
-        print('User sudah memiliki role $roleName');
         return false;
       }
 
@@ -126,7 +122,6 @@ class RoleService {
 
       return true;
     } catch (e) {
-      print('Error: $e');
       return false;
     }
   }

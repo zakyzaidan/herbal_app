@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:herbal_app/Feature/authentication/bloc/auth_bloc.dart';
-import 'package:herbal_app/Feature/authentication/ui/otp_verification_view.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -69,16 +69,9 @@ class _RegisterPageState extends State<RegisterPage> {
                 context,
               ).showSnackBar(SnackBar(content: Text(state.message)));
             } else if (state is AuthRegistrationOTPSent) {
-              Navigator.of(context).pushReplacement(
-                MaterialPageRoute(
-                  builder: (_) => BlocProvider.value(
-                    value: context.read<AuthBloc>(),
-                    child: OTPVerificationPage(
-                      email: state.email,
-                      pass: state.password,
-                    ),
-                  ),
-                ),
+              context.go(
+                '/otp_verification',
+                extra: {'email': state.email, 'password': state.password},
               );
             }
           },

@@ -2,17 +2,19 @@
 import 'dart:async';
 
 import 'package:bloc/bloc.dart';
+import 'package:get_it/get_it.dart';
 import 'package:herbal_app/data/models/practitioner_model.dart';
-import 'package:herbal_app/data/repositories/practitioner_repository.dart';
+import 'package:herbal_app/data/services/practitioner_services.dart';
 import 'package:meta/meta.dart';
 
 part 'praktisi_event.dart';
 part 'praktisi_state.dart';
 
 class PraktisiBloc extends Bloc<PraktisiEvent, PraktisiState> {
-  final PractitionerRepository _repository;
+  final PractitionerServices _practitionerServices =
+      GetIt.instance<PractitionerServices>();
 
-  PraktisiBloc(this._repository) : super(PraktisiInitial()) {
+  PraktisiBloc() : super(PraktisiInitial()) {
     on<LoadPractitionersEvent>(_onLoadPractitioners);
     on<SearchPractitionersEvent>(_onSearchPractitioners);
   }
@@ -26,9 +28,7 @@ class PraktisiBloc extends Bloc<PraktisiEvent, PraktisiState> {
     }
 
     try {
-      final practitioners = await _repository.getAllPractitioners(
-        forceRefresh: event.forceRefresh ?? false,
-      );
+      final practitioners = await _practitionerServices.getAllPractitioners();
       emit(PraktisiLoaded(practitioners));
     } catch (e) {
       emit(PraktisiError(e.toString()));
@@ -42,8 +42,8 @@ class PraktisiBloc extends Bloc<PraktisiEvent, PraktisiState> {
     emit(PraktisiLoading());
 
     try {
-      final practitioners = await _repository.searchPractitioners(
-        query: event.query,
+      final practitioners = await _practitionerServices.searchPractitioners(
+        event.query,
       );
       emit(PraktisiLoaded(practitioners));
     } catch (e) {

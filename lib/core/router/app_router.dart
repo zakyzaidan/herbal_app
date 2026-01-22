@@ -28,6 +28,7 @@ import 'package:herbal_app/Feature/forum/ui/forums_home_view.dart';
 import 'package:herbal_app/core/dependecy_injector/service_locator.dart';
 import 'package:herbal_app/core/router/shell_route_scaffold.dart';
 import 'package:herbal_app/data/models/practitioner_model.dart';
+import 'package:herbal_app/data/models/product_cart_model.dart';
 import 'package:herbal_app/data/models/product_model.dart';
 
 class AppRouter {
@@ -35,29 +36,35 @@ class AppRouter {
 
   AppRouter(this.authBloc);
 
+  final navigatorKey = GlobalKey<NavigatorState>();
+
   late final GoRouter router = GoRouter(
     initialLocation: '/splash',
     debugLogDiagnostics: true,
     refreshListenable: GoRouterRefreshStream(authBloc.stream),
+    navigatorKey: navigatorKey,
     redirect: (context, state) {
       final authState = authBloc.state;
-      final isAuthenticated = authState is AuthAuthenticated;
-      final isGoingToAuth = state.matchedLocation.startsWith('/auth');
-      final isSplash = state.matchedLocation == '/splash';
 
-      // Jika belum authenticated dan tidak ke auth pages
-      if (!isAuthenticated && !isGoingToAuth && !isSplash) {
+      final isSplash = state.matchedLocation == '/splash';
+      final isGoingToAuth = state.matchedLocation.startsWith('/auth');
+      final isAuthenticated = authState is AuthAuthenticated;
+
+      if (authState is AuthInitial) {
+        return isSplash ? null : '/splash';
+      }
+
+      if (isSplash) {
+        return isAuthenticated ? '/home' : '/auth/login';
+      }
+
+      if (!isAuthenticated && !isGoingToAuth) {
         return '/auth/login';
       }
 
-      // Jika sudah authenticated dan mencoba ke auth pages
-      if (isAuthenticated && isGoingToAuth) {
-        return '/home';
-      }
-
-      // No redirect
       return null;
     },
+
     routes: [
       // ===== SPLASH SCREEN =====
       GoRoute(
@@ -66,41 +73,46 @@ class AppRouter {
       ),
 
       // ===== AUTHENTICATION ROUTES =====
-      GoRoute(path: '/auth', redirect: (context, state) => '/auth/login'),
       GoRoute(
-        path: '/auth/login',
-        name: 'login',
-        builder: (context, state) => const LoginPage(),
-      ),
-      GoRoute(
-        path: '/auth/register',
-        name: 'register',
-        builder: (context, state) => const RegisterPage(),
-      ),
-      GoRoute(
-        path: '/auth/otp-verification',
-        name: 'otp-verification',
-        builder: (context, state) {
-          final extra = state.extra as Map<String, String>?;
-          return OTPVerificationPage(
-            email: extra?['email'] ?? '',
-            pass: extra?['pass'] ?? '',
-          );
-        },
-      ),
-      GoRoute(
-        path: '/auth/create-seller',
-        name: 'create-seller',
-        builder: (context, state) => const SellerProfileFormScreen(),
-      ),
-      GoRoute(
-        path: '/auth/create-practitioner',
-        name: 'create-practitioner',
-        builder: (context, state) => const PractitionerProfileFormScreen(),
+        path: '/auth',
+        redirect: (context, state) => '/auth/login',
+        routes: [
+          GoRoute(
+            path: 'login',
+            name: 'login',
+            builder: (context, state) => const LoginPage(),
+          ),
+          GoRoute(
+            path: 'register',
+            name: 'register',
+            builder: (context, state) => const RegisterPage(),
+          ),
+          GoRoute(
+            path: 'otp-verification',
+            name: 'otp-verification',
+            builder: (context, state) {
+              final extra = state.extra as Map<String, String>?;
+              return OTPVerificationPage(
+                email: extra?['email'] ?? '',
+                pass: extra?['pass'] ?? '',
+              );
+            },
+          ),
+          GoRoute(
+            path: '/auth/create-seller',
+            name: 'create-seller',
+            builder: (context, state) => const SellerProfileFormScreen(),
+          ),
+          GoRoute(
+            path: '/auth/create-practitioner',
+            name: 'create-practitioner',
+            builder: (context, state) => const PractitionerProfileFormScreen(),
+          ),
+        ],
       ),
 
       // ===== MAIN APP SHELL (Bottom Navigation) =====
-      ShellRoute(
+      StatefulShellRoute.indexedStack(
         builder: (context, state, child) {
           return MultiBlocProvider(
             providers: [
@@ -110,112 +122,140 @@ class AppRouter {
               BlocProvider<ProductBloc>(create: (_) => getIt<ProductBloc>()),
               BlocProvider<PraktisiBloc>(create: (_) => getIt<PraktisiBloc>()),
             ],
-            child: BottomNavigation(child: child),
+            child: BottomNavigation(navshell: child),
           );
         },
-        routes: [
+        branches: [
           // HOME
-          GoRoute(
-            path: '/home',
-            name: 'home',
-            pageBuilder: (context, state) =>
-                NoTransitionPage(child: const HomeScreen()),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/home',
+                name: 'home',
+                pageBuilder: (context, state) =>
+                    NoTransitionPage(child: const HomeScreen()),
+              ),
+            ],
           ),
 
           // PRODUCTS
-          GoRoute(
-            path: '/products',
-            name: 'products',
-            pageBuilder: (context, state) =>
-                NoTransitionPage(child: const ProductView()),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/products',
+                name: 'products',
+                pageBuilder: (context, state) =>
+                    NoTransitionPage(child: const ProductView()),
+                routes: [
+                  // ===== PRODUCT DETAIL ROUTES =====
+                  GoRoute(
+                    parentNavigatorKey: navigatorKey,
+                    path: '/:id',
+                    name: 'product-detail',
+                    builder: (context, state) {
+                      final product = state.extra as ProductCartModel;
+                      state.extra as ProductCartModel;
+                      return BlocProvider.value(
+                        value: getIt<ProductBloc>()
+                          ..add(
+                            LoadProductDetailEvent(product.id, authBloc.state),
+                          ),
+                        child: ProductDetailView(),
+                      );
+                    },
+                  ),
+                  GoRoute(
+                    parentNavigatorKey: navigatorKey,
+                    path: '/create',
+                    name: 'product-create',
+                    builder: (context, state) {
+                      final extra = state.extra as Map<String, dynamic>?;
+                      return BlocProvider.value(
+                        value: getIt<ProductBloc>(),
+                        child: ProductFormScreen(
+                          umkmId: extra?['umkmId'] ?? '',
+                          isFirstProduct: extra?['isFirstProduct'] ?? false,
+                        ),
+                      );
+                    },
+                  ),
+                  GoRoute(
+                    parentNavigatorKey: navigatorKey,
+                    path: '/:id/edit',
+                    name: 'product-edit',
+                    builder: (context, state) {
+                      final extra = state.extra as Map<String, dynamic>;
+                      return BlocProvider.value(
+                        value: getIt<ProductBloc>(),
+                        child: ProductEditFormScreen(
+                          product: extra['product'] as Product,
+                          umkmId: extra['umkmId'] as String,
+                        ),
+                      );
+                    },
+                  ),
+                ],
+              ),
+            ],
           ),
 
           // FORUMS
-          GoRoute(
-            path: '/forums',
-            name: 'forums',
-            pageBuilder: (context, state) =>
-                NoTransitionPage(child: const ForumsHomeView()),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/forums',
+                name: 'forums',
+                pageBuilder: (context, state) =>
+                    NoTransitionPage(child: const ForumsHomeView()),
+              ),
+            ],
           ),
 
           // PRACTITIONERS
-          GoRoute(
-            path: '/practitioners',
-            name: 'practitioners',
-            pageBuilder: (context, state) =>
-                NoTransitionPage(child: const PraktisiView()),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/practitioners',
+                name: 'practitioners',
+                pageBuilder: (context, state) =>
+                    NoTransitionPage(child: const PraktisiView()),
+                routes: [
+                  // ===== PRACTITIONER ROUTES =====
+                  GoRoute(
+                    parentNavigatorKey: navigatorKey,
+                    path: '/:id',
+                    name: 'practitioner-detail',
+                    builder: (context, state) {
+                      final practitioner = state.extra as PractitionerProfile;
+                      return PractitionerDetailView(practitioner: practitioner);
+                    },
+                  ),
+                  GoRoute(
+                    parentNavigatorKey: navigatorKey,
+                    path: '/:id/edit',
+                    name: 'practitioner-edit',
+                    builder: (context, state) {
+                      final profile = state.extra as PractitionerProfile;
+                      return PractitionerEditFormScreen(profile: profile);
+                    },
+                  ),
+                ],
+              ),
+            ],
           ),
 
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/profile',
+                name: 'profile',
+                pageBuilder: (context, state) =>
+                    NoTransitionPage(child: const ProfilView()),
+              ),
+            ],
+          ),
           // PROFILE
-          GoRoute(
-            path: '/profile',
-            name: 'profile',
-            pageBuilder: (context, state) =>
-                NoTransitionPage(child: const ProfilView()),
-          ),
         ],
-      ),
-
-      // ===== PRODUCT DETAIL ROUTES =====
-      GoRoute(
-        path: '/product/:id',
-        name: 'product-detail',
-        builder: (context, state) {
-          final product = state.extra as Product;
-          return BlocProvider.value(
-            value: getIt<ProductBloc>(),
-            child: ProductDetailView(
-              product: product,
-              sellerUmkmId: product.umkmId,
-            ),
-          );
-        },
-      ),
-      GoRoute(
-        path: '/product/create',
-        name: 'product-create',
-        builder: (context, state) {
-          final extra = state.extra as Map<String, dynamic>?;
-          return BlocProvider.value(
-            value: getIt<ProductBloc>(),
-            child: ProductFormScreen(
-              umkmId: extra?['umkmId'] ?? '',
-              isFirstProduct: extra?['isFirstProduct'] ?? false,
-            ),
-          );
-        },
-      ),
-      GoRoute(
-        path: '/product/:id/edit',
-        name: 'product-edit',
-        builder: (context, state) {
-          final extra = state.extra as Map<String, dynamic>;
-          return BlocProvider.value(
-            value: getIt<ProductBloc>(),
-            child: ProductEditFormScreen(
-              product: extra['product'] as Product,
-              umkmId: extra['umkmId'] as String,
-            ),
-          );
-        },
-      ),
-
-      // ===== PRACTITIONER ROUTES =====
-      GoRoute(
-        path: '/practitioner/:id',
-        name: 'practitioner-detail',
-        builder: (context, state) {
-          final practitioner = state.extra as PractitionerProfile;
-          return PractitionerDetailView(practitioner: practitioner);
-        },
-      ),
-      GoRoute(
-        path: '/practitioner/:id/edit',
-        name: 'practitioner-edit',
-        builder: (context, state) {
-          final profile = state.extra as PractitionerProfile;
-          return PractitionerEditFormScreen(profile: profile);
-        },
       ),
 
       // ===== SETTINGS =====
@@ -270,6 +310,26 @@ class SplashScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    return Scaffold(
+      backgroundColor: Color(Theme.of(context).primaryColor.toARGB32()),
+      body: Container(
+        alignment: Alignment.center,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.home_filled, size: 100, color: Colors.white),
+            SizedBox(height: 16),
+            Text(
+              'Herbal App',
+              style: TextStyle(
+                fontSize: 24,
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }

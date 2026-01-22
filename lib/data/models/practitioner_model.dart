@@ -97,6 +97,7 @@ class PractitionerProfile {
 
   Map<String, dynamic> toJson() {
     return {
+      'id': id,
       'full_name': fullName,
       'title': title,
       'education_history': educationHistory,

@@ -1,9 +1,11 @@
+import 'package:herbal_app/Feature/authentication/bloc/auth_bloc.dart';
+import 'package:herbal_app/data/models/product_cart_model.dart';
 import 'package:herbal_app/data/models/product_model.dart';
 import 'package:herbal_app/data/models/seller_model.dart';
 import 'package:herbal_app/data/services/supabase_storage_services.dart';
 import 'package:herbal_app/main.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:supabase_flutter/supabase_flutter.dart' hide AuthState;
 
 class SellerServices {
   final String _sellerTableName = 'umkm_profiles';
@@ -94,61 +96,123 @@ class SellerServices {
     return null;
   }
 
+  Future<SellerProfile?> getSellerByProductId(int productId) async {
+    final response = await supabase
+        .from(_productTableName)
+        .select('''
+        umkm:umkm_id (
+          id,
+          user_id,
+          nama_toko,
+          kategori_toko,
+          established_year,
+          alamat,
+          city,
+          province,
+          description,
+          social_media_url,
+          whatsapp_number,
+          products_services,
+          created_at,
+          updated_at,
+          business_logo
+        )
+      ''')
+        .eq('id', productId)
+        .maybeSingle();
+
+    if (response == null) return null;
+
+    final sellerJson = response['umkm'];
+    if (sellerJson == null) return null;
+
+    return SellerProfile.fromJson(sellerJson);
+  }
+
   /// ---------------------------------------------------
   /// Product Services
   /// ---------------------------------------------------
 
   // --- 1. Mendapatkan Semua Produk untuk Suatu UMKM ---
-  Future<List<Product>> getProductsByUmkmId(String umkmId) async {
-    try {
-      final response = await supabase
-          .from(_productTableName)
-          .select()
-          .eq('umkm_id', umkmId) // Filter berdasarkan ID UMKM
-          .order('created_at', ascending: false); // Urutkan dari terbaru
+  Future<List<ProductCartModel>> getProductsBySellerId(String umkmId) async {
+    final response = await supabase
+        .from(_productTableName)
+        .select('''
+        id,
+        umkm_id,
+        nama_produk,
+        image_url,
+        harga,
+        seller:umkm_id (
+          id,
+          nama_toko
+        )
+      ''')
+        .eq('umkm_id', umkmId)
+        .order('created_at', ascending: false);
 
-      // Mapping hasil List<Map<String, dynamic>> menjadi List<Product>
-      return (response as List<dynamic>)
-          .map((json) => Product.fromJson(json as Map<String, dynamic>))
-          .toList();
-    } catch (e) {
-      throw Exception('Gagal mengambil daftar produk: $e');
-    }
+    return (response as List)
+        .map((e) => ProductCartModel.fromSupabase(e))
+        .toList();
   }
 
   // --- 2. Mendapatkan 15 Produk Terbaru ---
-  Future<List<Product>> getNewestProducts() async {
-    try {
-      final response = await supabase
-          .from(_productTableName)
-          .select()
-          .order('created_at', ascending: false)
-          .limit(15);
+  Future<List<ProductCartModel>> getNewestProducts() async {
+    final response = await supabase
+        .from(_productTableName)
+        .select('''
+        id,
+        umkm_id,
+        nama_produk,
+        image_url,
+        harga,
+        seller:umkm_id (
+          id,
+          nama_toko
+        )
+      ''')
+        .order('created_at', ascending: false)
+        .limit(15);
 
-      return (response as List<dynamic>)
-          .map((json) => Product.fromJson(json as Map<String, dynamic>))
-          .toList();
-    } catch (e) {
-      throw Exception('Gagal mengambil daftar produk: $e');
-    }
+    return (response as List)
+        .map((e) => ProductCartModel.fromSupabase(e))
+        .toList();
+  }
+
+  Future<List<ProductCartModel>> getAllProducts() async {
+    final response = await supabase.from(_productTableName).select('''
+        id,
+        umkm_id,
+        nama_produk,
+        image_url,
+        harga,
+        seller:umkm_id (
+          id,
+          nama_toko
+        )
+      ''');
+
+    return (response as List)
+        .map((e) => ProductCartModel.fromSupabase(e))
+        .toList();
   }
 
   // --- 3. Mendapatkan semua produk ---
-  Future<List<Product>> getAllProducts() async {
-    try {
-      final response = await supabase
-          .from(_productTableName)
-          .select()
-          .order('created_at', ascending: false)
-          .limit(100);
+  // Future<List<Product>> getAllProducts() async {
+  //   try {
+  //     final response = await supabase
+  //         .from(_productTableName)
+  //         .select()
+  //         .order('created_at', ascending: false)
+  //         .limit(100);
 
-      return (response as List<dynamic>)
-          .map((json) => Product.fromJson(json as Map<String, dynamic>))
-          .toList();
-    } catch (e) {
-      throw Exception('Gagal mengambil daftar produk: $e');
-    }
-  }
+  //     return (response as List<dynamic>)
+  //         .map((json) => Product.fromJson(json as Map<String, dynamic>))
+  //         .toList();
+  //   } catch (e) {
+  //     throw Exception('Gagal mengambil daftar produk: $e');
+  //   }
+  // }
 
   // --- 2. Mendapatkan Detail Satu Produk berdasarkan ID Produk ---
   Future<Product?> getProductById(int productId) async {
@@ -169,6 +233,24 @@ class SellerServices {
     } catch (e) {
       throw Exception('Terjadi error saat mengambil produk: $e');
     }
+  }
+
+  Future<bool> isOwnerBySellerId(AuthState authState, String idSeller) async {
+    if (authState is! AuthAuthenticated) return false;
+
+    final user = authState.user;
+
+    if (!user.isRoleActive('penjual')) return false;
+
+    final seller = await supabase
+        .from('umkm_profiles')
+        .select('user_id')
+        .eq('id', idSeller)
+        .maybeSingle();
+
+    if (seller == null) return false;
+
+    return seller['user_id'] == user.id;
   }
 
   // --- 3. Menambahkan Produk Baru ---
@@ -207,5 +289,43 @@ class SellerServices {
     } catch (e) {
       throw Exception('Gagal menghapus produk: $e');
     }
+  }
+
+  Future<List<String>> getAllCategories() async {
+    final response = await supabase.from(_productTableName).select('kategori');
+
+    final Set<String> categories = {};
+
+    for (final row in response as List) {
+      final List<dynamic>? list = row['kategori'];
+      if (list != null) {
+        for (final item in list) {
+          categories.add(item.toString());
+        }
+      }
+    }
+
+    return categories.toList()..sort();
+  }
+
+  Future<List<ProductCartModel>> getProductsByCategory(String category) async {
+    final response = await supabase
+        .from(_productTableName)
+        .select('''
+        id,
+        umkm_id,
+        nama_produk,
+        foto_produk,
+        harga,
+        seller:umkm_id (
+          id,
+          nama_umkm
+        )
+      ''')
+        .contains('kategori', [category]);
+
+    return (response as List)
+        .map((e) => ProductCartModel.fromSupabase(e))
+        .toList();
   }
 }

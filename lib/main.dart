@@ -2,9 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:herbal_app/Feature/authentication/bloc/auth_bloc.dart';
-import 'package:herbal_app/Feature/authentication/ui/login_view.dart';
 import 'package:herbal_app/core/dependecy_injector/service_locator.dart';
-import 'package:herbal_app/main_navigation.dart';
+import 'package:herbal_app/core/router/app_router.dart';
 import 'package:herbal_app/core/themes/app_theme.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' hide AuthState;
 
@@ -29,15 +28,14 @@ class MyApp extends StatelessWidget {
       create: (context) => getIt<AuthBloc>()..add(AuthCheckRequested()),
       child: BlocBuilder<AuthBloc, AuthState>(
         builder: (context, state) {
-          return MaterialApp(
+          final appRouter = getIt<AppRouter>();
+          return MaterialApp.router(
+            routerConfig: appRouter.router,
             debugShowCheckedModeBanner: false,
             title: 'Herbal App',
             themeMode: ThemeMode.light,
             darkTheme: AppTheme.dark,
             theme: AppTheme.light,
-            home: state is AuthAuthenticated
-                ? const MainNavigation()
-                : const LoginPage(),
           );
         },
       ),

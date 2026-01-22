@@ -9,10 +9,17 @@ class LoadAllProductsEvent extends ProductEvent {
   LoadAllProductsEvent({this.forceRefresh});
 }
 
-class CreateProductEvent extends ProductEvent {
-  final Product productInput;
+class LoadProductDetailEvent extends ProductEvent {
+  final int productId;
+  final AuthState authState;
 
-  CreateProductEvent({required this.productInput});
+  LoadProductDetailEvent(this.productId, this.authState);
+}
+
+class CreateProductEvent extends ProductEvent {
+  final Product product;
+
+  CreateProductEvent({required this.product});
 }
 
 class LoadProductsSellerEvent extends ProductEvent {
@@ -22,21 +29,15 @@ class LoadProductsSellerEvent extends ProductEvent {
   LoadProductsSellerEvent(this.umkmId, {this.forceRefresh});
 }
 
-class GetProductDetailEvent extends ProductEvent {
-  final int productId;
-
-  GetProductDetailEvent(this.productId);
-}
-
 class UpdateProductEvent extends ProductEvent {
-  final String productId;
+  final int productId;
   final Product product;
 
   UpdateProductEvent(this.productId, this.product);
 }
 
 class DeleteProductEvent extends ProductEvent {
-  final String productId;
+  final int productId;
 
   DeleteProductEvent(this.productId);
 }

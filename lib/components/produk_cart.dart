@@ -1,55 +1,37 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:herbal_app/Feature/product/bloc/product_bloc.dart';
-import 'package:herbal_app/Feature/product/ui/product_detail_view.dart';
-import 'package:herbal_app/core/dependecy_injector/service_locator.dart';
-import 'package:herbal_app/data/models/product_model.dart';
+import 'package:go_router/go_router.dart';
+import 'package:herbal_app/data/models/product_cart_model.dart';
 
 class ProdukCart extends StatelessWidget {
-  final Product product;
+  final ProductCartModel product;
 
   const ProdukCart({super.key, required this.product});
-
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => BlocProvider<ProductBloc>(
-              create: (context) => getIt<ProductBloc>(),
-              child: ProductDetailView(
-                product: product,
-                sellerUmkmId: product.umkmId,
-              ),
-            ),
-          ),
-        );
+        context.push('/products/${product.id}', extra: product);
       },
       child: Container(
         padding: const EdgeInsets.all(7),
-        clipBehavior: Clip.antiAlias,
-        decoration: ShapeDecoration(
+        decoration: BoxDecoration(
           color: Colors.white,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
-          ),
-          shadows: const [
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
             BoxShadow(
               color: Color(0x3F000000),
               blurRadius: 4,
-              offset: Offset(0, 2),
+              offset: const Offset(0, 2),
             ),
           ],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min, // ⬅️ penting
+          // mainAxisSize: MainAxisSize.min, // ⬅️ penting
           children: [
             AspectRatio(
-              aspectRatio: 1, // kotak 1:1
+              aspectRatio: 1,
               child: Container(
                 decoration: BoxDecoration(
                   color: Colors.grey[200],
@@ -80,14 +62,14 @@ class ProdukCart extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              product.namaProduk,
+              product.namaProduk ?? '',
               style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
             ),
             const SizedBox(height: 4),
             Text(
-              'Rp ${_formatPrice(product.harga)}',
+              'Rp ${_formatPrice(product.harga ?? 0)}',
               style: TextStyle(
                 fontSize: 14,
                 color: Colors.green[700],

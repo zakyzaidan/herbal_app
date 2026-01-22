@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:herbal_app/Feature/home/bloc/home_bloc.dart';
 import 'package:herbal_app/Feature/home/ui/home_img_slider.dart';
 import 'package:herbal_app/components/produk_cart.dart';
 import 'package:herbal_app/components/practitioner_card_vertical.dart';
 import 'package:herbal_app/components/search_bar_widget.dart';
-import 'package:herbal_app/data/models/product_model.dart';
+import 'package:herbal_app/data/models/product_cart_model.dart';
 import 'package:herbal_app/data/models/practitioner_model.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -77,19 +78,18 @@ class _HomeScreenState extends State<HomeScreen> {
                   if (state is HomeLoaded) {
                     return Column(
                       children: [
-                        // Produk Terbaru
-                        _buildProductSection(
-                          context,
-                          'Produk Terbaru',
-                          state.products,
-                        ),
-                        const SizedBox(height: 32),
-
                         // Praktisi Section
                         _buildPractitionerSection(
                           context,
                           'Praktisi',
                           state.practitioners,
+                        ),
+                        const SizedBox(height: 32),
+                        // Produk Terbaru
+                        _buildProductSection(
+                          context,
+                          'Produk Terbaru',
+                          state.products,
                         ),
                         const SizedBox(height: 32),
 
@@ -142,7 +142,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildProductSection(
     BuildContext context,
     String title,
-    List<Product> products,
+    List<ProductCartModel> products,
   ) {
     return Column(
       children: [
@@ -160,7 +160,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               TextButton(
                 onPressed: () {
-                  // TODO: Navigate to all products
+                  context.go('/products');
                 },
                 child: Text(
                   'Lebih banyak',
@@ -187,7 +187,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   separatorBuilder: (context, index) =>
                       const SizedBox(width: 15),
                   itemBuilder: (context, index) {
-                    return SizedBox(
+                    return Container(
+                      padding: const EdgeInsets.only(bottom: 8),
                       width: 160,
                       child: ProdukCart(product: products[index]),
                     );
@@ -219,7 +220,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               TextButton(
                 onPressed: () {
-                  // TODO: Navigate to all practitioners
+                  context.go('/practitioners');
                 },
                 child: Text(
                   'Lebih banyak',
@@ -249,7 +250,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       const SizedBox(width: 15),
                   itemBuilder: (context, index) {
                     return SizedBox(
-                      width: 180,
+                      width: 160,
                       child: PractitionerCardVertical(
                         practitioner: practitioners[index],
                       ),

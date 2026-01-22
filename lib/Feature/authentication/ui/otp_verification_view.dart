@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:herbal_app/Feature/authentication/bloc/auth_bloc.dart';
-import 'package:herbal_app/main_navigation.dart';
 
 // ====================
 // OTP VERIFICATION PAGE
@@ -58,10 +58,7 @@ class _OTPVerificationPageState extends State<OTPVerificationPage> {
                 context,
               ).showSnackBar(SnackBar(content: Text(state.message)));
             } else if (state is AuthAuthenticated) {
-              Navigator.of(context).pushAndRemoveUntil(
-                MaterialPageRoute(builder: (_) => const MainNavigation()),
-                (route) => false,
-              );
+              context.go('/main');
             }
           },
           builder: (context, state) {

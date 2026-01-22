@@ -1,20 +1,21 @@
 // lib/Feature/home/bloc/home_bloc.dart
 import 'package:bloc/bloc.dart';
-import 'package:herbal_app/data/models/product_model.dart';
+import 'package:get_it/get_it.dart';
+import 'package:herbal_app/data/models/product_cart_model.dart';
 import 'package:herbal_app/data/models/practitioner_model.dart';
-import 'package:herbal_app/data/repositories/product_repository.dart';
-import 'package:herbal_app/data/repositories/practitioner_repository.dart';
+import 'package:herbal_app/data/services/practitioner_services.dart';
+import 'package:herbal_app/data/services/seller_services.dart';
 import 'package:meta/meta.dart';
 
 part 'home_event.dart';
 part 'home_state.dart';
 
 class HomeBloc extends Bloc<HomeEvent, HomeState> {
-  final ProductRepository _productRepository;
-  final PractitionerRepository _practitionerRepository;
+  final SellerServices _sellerServices = GetIt.instance<SellerServices>();
+  final PractitionerServices _practitionerServices =
+      GetIt.instance<PractitionerServices>();
 
-  HomeBloc(this._productRepository, this._practitionerRepository)
-    : super(HomeInitial()) {
+  HomeBloc() : super(HomeInitial()) {
     on<LoadHomeDataEvent>(_onLoadHomeData);
     on<SelectCategoryEvent>(_onSelectCategory);
   }
@@ -23,34 +24,16 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     LoadHomeDataEvent event,
     Emitter<HomeState> emit,
   ) async {
-    // Jangan emit loading jika sudah ada data
     if (state is! HomeLoaded) {
       emit(HomeLoading());
     }
 
     try {
-      // Load data secara parallel untuk performa lebih baik
-      final results = await Future.wait([
-        _productRepository.getNewestProducts(
-          forceRefresh: event.forceRefresh ?? false,
-        ),
-        _practitionerRepository.getAllPractitioners(
-          forceRefresh: event.forceRefresh ?? false,
-        ),
-      ]);
-
-      final products = results[0] as List<Product>;
-      final practitioners = results[1] as List<PractitionerProfile>;
-
-      // Ekstrak kategori
-      final Set<String> categoriesSet = {};
-      for (var product in products) {
-        if (product.kategori != null) {
-          categoriesSet.addAll(product.kategori!);
-        }
-      }
-
-      final List<String> categories = categoriesSet.toList()..sort();
+      final List<ProductCartModel> products = await _sellerServices
+          .getAllProducts();
+      final List<PractitionerProfile> practitioners =
+          await _practitionerServices.getAllPractitioners();
+      final List<String> categories = await _sellerServices.getAllCategories();
 
       emit(
         HomeLoaded(

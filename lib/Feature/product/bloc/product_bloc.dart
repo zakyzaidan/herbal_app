@@ -2,21 +2,25 @@
 import 'dart:async';
 
 import 'package:bloc/bloc.dart';
+import 'package:get_it/get_it.dart';
+import 'package:herbal_app/Feature/authentication/bloc/auth_bloc.dart';
+import 'package:herbal_app/data/models/product_cart_model.dart';
 import 'package:herbal_app/data/models/product_model.dart';
-import 'package:herbal_app/data/repositories/product_repository.dart';
+import 'package:herbal_app/data/models/seller_model.dart';
+import 'package:herbal_app/data/services/seller_services.dart';
 import 'package:meta/meta.dart';
 
 part 'product_event.dart';
 part 'product_state.dart';
 
 class ProductBloc extends Bloc<ProductEvent, ProductState> {
-  final ProductRepository _repository;
+  final SellerServices _sellerServices = GetIt.instance<SellerServices>();
 
-  ProductBloc(this._repository) : super(ProductInitial()) {
+  ProductBloc() : super(ProductInitial()) {
     on<LoadAllProductsEvent>(_onLoadAllProducts);
     on<CreateProductEvent>(_onCreateProduct);
     on<LoadProductsSellerEvent>(_onLoadSellerProducts);
-    on<GetProductDetailEvent>(_onGetProductDetail);
+    on<LoadProductDetailEvent>(_onGetProductDetail);
     on<UpdateProductEvent>(_onUpdateProduct);
     on<DeleteProductEvent>(_onDeleteProduct);
   }
@@ -31,19 +35,11 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
     }
 
     try {
-      final products = await _repository.getAllProducts(
-        forceRefresh: event.forceRefresh ?? false,
-      );
+      final List<ProductCartModel> products = await _sellerServices
+          .getAllProducts();
+      final categories = await _sellerServices.getAllCategories();
 
-      // Ekstrak kategori
-      final Set<String> categoriesSet = {};
-      for (var product in products) {
-        if (product.kategori != null) {
-          categoriesSet.addAll(product.kategori!);
-        }
-      }
-
-      emit(AllProductsLoaded(products, categoriesSet.toList()));
+      emit(AllProductsLoaded(products, categories));
     } catch (e) {
       emit(ProductError(e.toString()));
     }
@@ -54,8 +50,10 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
     Emitter<ProductState> emit,
   ) async {
     emit(ProductLoading());
+
     try {
-      final product = await _repository.addProduct(event.productInput);
+      final product = await _sellerServices.addProduct(event.product);
+
       emit(ProductCreatedSuccess(product));
     } catch (e) {
       emit(ProductError(e.toString()));
@@ -71,10 +69,10 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
     }
 
     try {
-      final products = await _repository.getProductsByUmkmId(
+      final products = await _sellerServices.getProductsBySellerId(
         event.umkmId,
-        forceRefresh: event.forceRefresh ?? false,
       );
+
       emit(ProductsSellerLoaded(products));
     } catch (e) {
       emit(ProductError(e.toString()));
@@ -82,17 +80,21 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
   }
 
   Future<void> _onGetProductDetail(
-    GetProductDetailEvent event,
+    LoadProductDetailEvent event,
     Emitter<ProductState> emit,
   ) async {
     emit(ProductLoading());
     try {
-      final product = await _repository.getProductById(event.productId);
-      if (product != null) {
-        emit(ProductDetailLoaded(product));
-      } else {
-        emit(ProductError('Produk tidak ditemukan'));
-      }
+      final product = await _sellerServices.getProductById(event.productId);
+      final seller = await _sellerServices.getSellerByProductId(
+        event.productId,
+      );
+      final bool isOwner = await _sellerServices.isOwnerBySellerId(
+        event.authState,
+        product!.umkmId,
+      );
+
+      emit(ProductDetailLoaded(product, seller!, isOwner));
     } catch (e) {
       emit(ProductError(e.toString()));
     }
@@ -104,8 +106,8 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
   ) async {
     emit(ProductLoading());
     try {
-      final product = await _repository.updateProduct(
-        int.parse(event.productId),
+      final product = await _sellerServices.updateProduct(
+        event.productId,
         event.product,
       );
       emit(ProductUpdatedSuccess(product));
@@ -120,7 +122,7 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
   ) async {
     emit(ProductLoading());
     try {
-      await _repository.deleteProduct(int.parse(event.productId));
+      await _sellerServices.deleteProduct(event.productId);
       emit(ProductDeletedSuccess());
     } catch (e) {
       emit(ProductError(e.toString()));

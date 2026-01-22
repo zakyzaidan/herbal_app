@@ -1,6 +1,7 @@
 // lib/Feature/praktisi/ui/practitioner_detail_view.dart
 
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:herbal_app/data/models/practitioner_model.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -49,7 +50,7 @@ class PractitionerDetailView extends StatelessWidget {
             left: 16,
             child: IconButton(
               icon: Icon(Icons.arrow_back, color: Colors.black),
-              onPressed: () => Navigator.pop(context),
+              onPressed: () => context.pop(),
             ),
           ),
 

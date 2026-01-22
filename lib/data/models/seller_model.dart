@@ -1,4 +1,3 @@
-
 class SellerProfile {
   // Field-field yang wajib ada
   final String id;
@@ -46,10 +45,10 @@ class SellerProfile {
     return SellerProfile(
       id: json['id'] as String,
       userId: json['user_id'] as String,
-      businessName: json['business_name'] as String,
-      businessCategory: json['business_category'] as String?,
+      businessName: json['nama_toko'] as String,
+      businessCategory: json['kategori_toko'] as String?,
       establishedYear: json['established_year'] as int?,
-      businessAddress: json['business_address'] as String?,
+      businessAddress: json['alamat'] as String?,
       city: json['city'] as String?,
       province: json['province'] as String?,
       description: json['description'] as String?,

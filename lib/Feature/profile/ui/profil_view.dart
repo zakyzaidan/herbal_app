@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:herbal_app/Feature/authentication/bloc/auth_bloc.dart';
 import 'package:herbal_app/Feature/profile/ui/practitioner_profile_view.dart';
 import 'package:herbal_app/Feature/profile/ui/seller_profile_view.dart';
-import 'package:herbal_app/Feature/settings/ui/settings_view.dart';
 import 'package:herbal_app/data/models/user_model.dart';
 
 class ProfilView extends StatelessWidget {
@@ -107,10 +107,7 @@ class BasicProfileView extends StatelessWidget {
               IconButton(
                 icon: const Icon(Icons.settings_outlined, color: Colors.white),
                 onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const SettingsView()),
-                  );
+                  context.push('/settings');
                 },
               ),
             ],

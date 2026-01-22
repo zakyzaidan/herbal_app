@@ -3,8 +3,7 @@
 // ============================================================================
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
-import 'package:herbal_app/Feature/product/ui/form_create_product_view.dart';
-import 'package:herbal_app/Feature/settings/ui/settings_view.dart';
+import 'package:go_router/go_router.dart';
 import 'package:herbal_app/components/produk_cart.dart';
 import 'package:herbal_app/data/models/seller_model.dart';
 import 'package:herbal_app/data/models/user_model.dart';
@@ -38,7 +37,9 @@ class _SellerProfileViewState extends State<SellerProfileView>
     try {
       final profile = await _sellerServices.getProfileByUserId(widget.user.id);
       if (profile != null) {
-        final products = await _sellerServices.getProductsByUmkmId(profile.id);
+        final products = await _sellerServices.getProductsBySellerId(
+          profile.id,
+        );
         setState(() {
           _sellerProfile = profile;
           _products = products;
@@ -102,13 +103,9 @@ class _SellerProfileViewState extends State<SellerProfileView>
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
           // Navigate to add product
-          Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (context) => ProductFormScreen(
-                umkmId: _sellerProfile!.id,
-                isFirstProduct: false,
-              ),
-            ),
+          context.push(
+            '/add_product',
+            extra: {'umkmId': _sellerProfile!.id, 'isFirstProduct': false},
           );
         },
         icon: const Icon(Icons.add),
@@ -144,10 +141,7 @@ class _SellerProfileViewState extends State<SellerProfileView>
               IconButton(
                 icon: const Icon(Icons.settings_outlined, color: Colors.white),
                 onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const SettingsView()),
-                  );
+                  context.push('/settings');
                 },
               ),
             ],
