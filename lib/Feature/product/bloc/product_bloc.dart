@@ -35,11 +35,17 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
     }
 
     try {
-      final List<ProductCartModel> products = await _sellerServices
-          .getAllProducts();
+      String selecteCategory = event.selectedCategory;
+      List<ProductCartModel> products;
+      if (selecteCategory == '' || selecteCategory == 'Semua Produk') {
+        products = await _sellerServices.getAllProducts();
+        selecteCategory = '';
+      } else {
+        products = await _sellerServices.getProductsByCategory(selecteCategory);
+      }
       final categories = await _sellerServices.getAllCategories();
 
-      emit(AllProductsLoaded(products, categories));
+      emit(AllProductsLoaded(products, categories, selecteCategory));
     } catch (e) {
       emit(ProductError(e.toString()));
     }

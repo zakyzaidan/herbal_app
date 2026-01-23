@@ -5,8 +5,9 @@ sealed class ProductEvent {}
 
 class LoadAllProductsEvent extends ProductEvent {
   final bool? forceRefresh;
+  final String selectedCategory;
 
-  LoadAllProductsEvent({this.forceRefresh});
+  LoadAllProductsEvent({this.forceRefresh, this.selectedCategory = ''});
 }
 
 class LoadProductDetailEvent extends ProductEvent {

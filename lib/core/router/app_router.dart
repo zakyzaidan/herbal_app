@@ -47,7 +47,7 @@ class AppRouter {
       final authState = authBloc.state;
 
       final isSplash = state.matchedLocation == '/splash';
-      final isGoingToAuth = state.matchedLocation.startsWith('/auth');
+      // final isGoingToAuth = state.matchedLocation.startsWith('/auth');
       final isAuthenticated = authState is AuthAuthenticated;
 
       if (authState is AuthInitial) {
@@ -58,7 +58,7 @@ class AppRouter {
         return isAuthenticated ? '/home' : '/auth/login';
       }
 
-      if (!isAuthenticated && !isGoingToAuth) {
+      if (!isAuthenticated) {
         return '/auth/login';
       }
 
@@ -78,17 +78,17 @@ class AppRouter {
         redirect: (context, state) => '/auth/login',
         routes: [
           GoRoute(
-            path: 'login',
+            path: '/login',
             name: 'login',
             builder: (context, state) => const LoginPage(),
           ),
           GoRoute(
-            path: 'register',
+            path: '/register',
             name: 'register',
             builder: (context, state) => const RegisterPage(),
           ),
           GoRoute(
-            path: 'otp-verification',
+            path: '/otp-verification',
             name: 'otp-verification',
             builder: (context, state) {
               final extra = state.extra as Map<String, String>?;
@@ -99,12 +99,12 @@ class AppRouter {
             },
           ),
           GoRoute(
-            path: '/auth/create-seller',
+            path: '/create-seller',
             name: 'create-seller',
             builder: (context, state) => const SellerProfileFormScreen(),
           ),
           GoRoute(
-            path: '/auth/create-practitioner',
+            path: '/create-practitioner',
             name: 'create-practitioner',
             builder: (context, state) => const PractitionerProfileFormScreen(),
           ),
@@ -150,11 +150,22 @@ class AppRouter {
                   // ===== PRODUCT DETAIL ROUTES =====
                   GoRoute(
                     parentNavigatorKey: navigatorKey,
+                    path: '/create',
+                    name: 'product-create',
+                    builder: (context, state) {
+                      final umkmId = state.extra;
+                      return BlocProvider.value(
+                        value: getIt<ProductBloc>(),
+                        child: ProductFormScreen(umkmId: umkmId as String),
+                      );
+                    },
+                  ),
+                  GoRoute(
+                    parentNavigatorKey: navigatorKey,
                     path: '/:id',
                     name: 'product-detail',
                     builder: (context, state) {
                       final product = state.extra as ProductCartModel;
-                      state.extra as ProductCartModel;
                       return BlocProvider.value(
                         value: getIt<ProductBloc>()
                           ..add(
@@ -164,21 +175,7 @@ class AppRouter {
                       );
                     },
                   ),
-                  GoRoute(
-                    parentNavigatorKey: navigatorKey,
-                    path: '/create',
-                    name: 'product-create',
-                    builder: (context, state) {
-                      final extra = state.extra as Map<String, dynamic>?;
-                      return BlocProvider.value(
-                        value: getIt<ProductBloc>(),
-                        child: ProductFormScreen(
-                          umkmId: extra?['umkmId'] ?? '',
-                          isFirstProduct: extra?['isFirstProduct'] ?? false,
-                        ),
-                      );
-                    },
-                  ),
+
                   GoRoute(
                     parentNavigatorKey: navigatorKey,
                     path: '/:id/edit',

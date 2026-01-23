@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:herbal_app/Feature/home/bloc/home_bloc.dart';
 import 'package:herbal_app/Feature/home/ui/home_img_slider.dart';
+import 'package:herbal_app/components/category_section.dart';
 import 'package:herbal_app/components/produk_cart.dart';
 import 'package:herbal_app/components/practitioner_card_vertical.dart';
 import 'package:herbal_app/components/search_bar_widget.dart';
@@ -98,7 +99,9 @@ class _HomeScreenState extends State<HomeScreen> {
                           context,
                           state.categories,
                           state.selectedCategory,
+                          3,
                         ),
+
                         const SizedBox(height: 24),
                       ],
                     );
@@ -265,143 +268,30 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildCategorySection(
     BuildContext context,
     List<String> categories,
-    String? selectedCategory,
+    String selectedCategory,
+    int jumlahBaris, //disini tambahannya
   ) {
-    // Jika tidak ada kategori dari database
-    if (categories.isEmpty) {
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 15),
-            child: Text(
-              'Kategori Produk',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-          ),
-          const SizedBox(height: 12),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 15),
-            child: Text(
-              'Belum ada kategori produk',
-              style: TextStyle(color: Colors.grey[600]),
-            ),
-          ),
-        ],
-      );
-    }
-
-    // Pisahkan kategori menjadi 2 baris
-    final int itemsPerRow = (categories.length / 2).ceil();
-    final List<String> firstRow = categories.take(itemsPerRow).toList();
-    final List<String> secondRow = categories.skip(itemsPerRow).toList();
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
+
       children: [
         const Padding(
           padding: EdgeInsets.symmetric(horizontal: 15),
-          child: Text(
-            'Kategori Produk',
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          child: Row(
+            children: [
+              Text(
+                'Kategori Produk',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+            ],
           ),
         ),
         const SizedBox(height: 12),
-
-        // First row
-        SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          padding: const EdgeInsets.symmetric(horizontal: 15),
-          child: Row(
-            children: firstRow.map((category) {
-              final isSelected = selectedCategory == category;
-              return Padding(
-                padding: const EdgeInsets.only(right: 8),
-                child: FilterChip(
-                  label: Text(category),
-                  selected: isSelected,
-                  onSelected: (selected) {
-                    context.read<HomeBloc>().add(SelectCategoryEvent(category));
-
-                    // Show snackbar untuk coming soon
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text('Coming soon: Filter produk $category'),
-                        duration: const Duration(seconds: 2),
-                      ),
-                    );
-                  },
-                  backgroundColor: isSelected
-                      ? const Color(0xFF0A400C)
-                      : Colors.green[100],
-                  selectedColor: const Color(0xFF0A400C),
-                  labelStyle: TextStyle(
-                    color: isSelected ? Colors.white : Colors.green[900],
-                    fontWeight: FontWeight.w500,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20),
-                    side: BorderSide.none,
-                  ),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 8,
-                  ),
-                ),
-              );
-            }).toList(),
-          ),
+        CategorySection(
+          categories: categories,
+          selectedCategory: selectedCategory,
+          jumlahBaris: jumlahBaris,
         ),
-
-        // Second row (jika ada)
-        if (secondRow.isNotEmpty) ...[
-          const SizedBox(height: 8),
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(horizontal: 15),
-            child: Row(
-              children: secondRow.map((category) {
-                final isSelected = selectedCategory == category;
-                return Padding(
-                  padding: const EdgeInsets.only(right: 8),
-                  child: FilterChip(
-                    label: Text(category),
-                    selected: isSelected,
-                    onSelected: (selected) {
-                      context.read<HomeBloc>().add(
-                        SelectCategoryEvent(category),
-                      );
-
-                      // Show snackbar untuk coming soon
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text('Coming soon: Filter produk $category'),
-                          duration: const Duration(seconds: 2),
-                        ),
-                      );
-                    },
-                    backgroundColor: isSelected
-                        ? const Color(0xFF0A400C)
-                        : Colors.green[100],
-                    selectedColor: const Color(0xFF0A400C),
-                    labelStyle: TextStyle(
-                      color: isSelected ? Colors.white : Colors.green[900],
-                      fontWeight: FontWeight.w500,
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
-                      side: BorderSide.none,
-                    ),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 8,
-                    ),
-                  ),
-                );
-              }).toList(),
-            ),
-          ),
-        ],
       ],
     );
   }

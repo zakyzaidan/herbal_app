@@ -422,8 +422,7 @@ class RoleSelectionBottomSheet extends StatelessWidget {
             title: 'Buat Akun Penjual',
             subtitle: 'Daftar sebagai penjual produk herbal',
             onTap: () {
-              context.pop();
-              context.go('/register-seller');
+              context.goNamed('create-seller');
             },
           ),
         );
@@ -452,8 +451,7 @@ class RoleSelectionBottomSheet extends StatelessWidget {
             title: 'Buat Akun Praktisi Herbal',
             subtitle: 'Daftar sebagai praktisi herbal',
             onTap: () {
-              context.pop();
-              context.go('/register-practitioner');
+              context.goNamed('create-practitioner');
             },
           ),
         );
@@ -497,8 +495,7 @@ class RoleSelectionBottomSheet extends StatelessWidget {
             title: 'Buat Akun Praktisi Herbal',
             subtitle: 'Daftar sebagai praktisi herbal',
             onTap: () {
-              context.pop();
-              context.go('/register-practitioner');
+              context.goNamed('create-practitioner');
             },
           ),
         );
@@ -542,8 +539,8 @@ class RoleSelectionBottomSheet extends StatelessWidget {
             title: 'Buat Akun Penjual',
             subtitle: 'Daftar sebagai penjual produk herbal',
             onTap: () {
-              context.pop();
-              context.go('/register-seller');
+              ;
+              context.goNamed('create-seller');
             },
           ),
         );

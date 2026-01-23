@@ -17,7 +17,6 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
 
   HomeBloc() : super(HomeInitial()) {
     on<LoadHomeDataEvent>(_onLoadHomeData);
-    on<SelectCategoryEvent>(_onSelectCategory);
   }
 
   Future<void> _onLoadHomeData(
@@ -40,34 +39,11 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
           products: products,
           practitioners: practitioners,
           categories: categories,
-          selectedCategory: null,
+          selectedCategory: '',
         ),
       );
     } catch (e) {
       emit(HomeError(e.toString()));
-    }
-  }
-
-  Future<void> _onSelectCategory(
-    SelectCategoryEvent event,
-    Emitter<HomeState> emit,
-  ) async {
-    if (state is HomeLoaded) {
-      final currentState = state as HomeLoaded;
-
-      final newSelectedCategory =
-          currentState.selectedCategory == event.category
-          ? null
-          : event.category;
-
-      emit(
-        HomeLoaded(
-          products: currentState.products,
-          practitioners: currentState.practitioners,
-          categories: currentState.categories,
-          selectedCategory: newSelectedCategory,
-        ),
-      );
     }
   }
 }

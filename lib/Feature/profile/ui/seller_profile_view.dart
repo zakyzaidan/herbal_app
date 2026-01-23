@@ -103,10 +103,7 @@ class _SellerProfileViewState extends State<SellerProfileView>
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
           // Navigate to add product
-          context.push(
-            '/add_product',
-            extra: {'umkmId': _sellerProfile!.id, 'isFirstProduct': false},
-          );
+          context.push('/products/create', extra: _sellerProfile!.id);
         },
         icon: const Icon(Icons.add),
         label: const Text('Tambah Produk'),
@@ -225,14 +222,26 @@ class _SellerProfileViewState extends State<SellerProfileView>
 
   Widget _buildTabBar() {
     return Container(
-      decoration: BoxDecoration(
-        border: Border(bottom: BorderSide(color: Colors.grey[300]!)),
-      ),
+      color: Colors.white,
+      padding: const EdgeInsets.symmetric(horizontal: 16),
       child: TabBar(
         controller: _tabController,
+        isScrollable: true,
         labelColor: const Color(0xFF0A400C),
         unselectedLabelColor: Colors.grey,
-        indicatorColor: const Color(0xFF0A400C),
+        labelStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+        unselectedLabelStyle: const TextStyle(
+          fontSize: 16,
+          fontWeight: FontWeight.w400,
+        ),
+        indicator: UnderlineTabIndicator(
+          borderSide: BorderSide(
+            width: 2,
+            strokeAlign: BorderSide.strokeAlignCenter,
+            color: const Color(0xFF0A400C),
+          ),
+        ),
+        dividerColor: Colors.white,
         tabs: const [
           Tab(text: 'Toko'),
           Tab(text: 'Produk'),

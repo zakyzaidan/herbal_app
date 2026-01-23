@@ -1,5 +1,6 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:herbal_app/data/models/slider_model.dart';
 
 class HomeImgSlider extends StatefulWidget {
@@ -127,7 +128,9 @@ class _HomeImgSliderState extends State<HomeImgSlider> {
                   ),
                   const SizedBox(height: 20),
                   ElevatedButton(
-                    onPressed: data.onButtonPressed ?? () {},
+                    onPressed: () {
+                      context.goNamed("${data.linkToPage}");
+                    },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.white,
                       foregroundColor: data.gradientColors.first,

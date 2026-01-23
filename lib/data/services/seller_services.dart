@@ -315,11 +315,11 @@ class SellerServices {
         id,
         umkm_id,
         nama_produk,
-        foto_produk,
+        image_url,
         harga,
         seller:umkm_id (
           id,
-          nama_umkm
+          nama_toko
         )
       ''')
         .contains('kategori', [category]);

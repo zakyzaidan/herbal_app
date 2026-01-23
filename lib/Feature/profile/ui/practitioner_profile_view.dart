@@ -258,7 +258,7 @@ class _PractitionerProfileViewState extends State<PractitionerProfileView>
                   onPressed: () async {
                     if (_practitionerProfile != null) {
                       context.push(
-                        '/practitioner/${_practitionerProfile!.id}',
+                        '/practitioners/${_practitionerProfile!.id}',
                         extra: _practitionerProfile,
                       );
                       _loadPractitionerData();

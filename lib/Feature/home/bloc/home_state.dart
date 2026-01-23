@@ -11,13 +11,13 @@ final class HomeLoaded extends HomeState {
   final List<ProductCartModel> products;
   final List<PractitionerProfile> practitioners;
   final List<String> categories; // List kategori dari semua produk
-  final String? selectedCategory; // Kategori yang sedang dipilih (nullable)
+  final String selectedCategory; // Kategori yang sedang dipilih (nullable)
 
   HomeLoaded({
     required this.products,
     required this.practitioners,
     required this.categories,
-    this.selectedCategory,
+    required this.selectedCategory,
   });
 }
 

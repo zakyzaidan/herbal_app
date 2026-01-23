@@ -46,6 +46,7 @@ class _BottomNavigationState extends State<BottomNavigation> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Color(0xFFF5F5F5),
       body: widget.navshell,
       bottomNavigationBar: StylishBottomBar(
         currentIndex: widget.navshell.currentIndex,

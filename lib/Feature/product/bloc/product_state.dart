@@ -12,8 +12,9 @@ class ProductDeletedSuccess extends ProductState {}
 class AllProductsLoaded extends ProductState {
   final List<ProductCartModel> products;
   final List<String> categories;
+  final String selectedCategory;
 
-  AllProductsLoaded(this.products, this.categories);
+  AllProductsLoaded(this.products, this.categories, this.selectedCategory);
 }
 
 class ProductCreatedSuccess extends ProductState {
