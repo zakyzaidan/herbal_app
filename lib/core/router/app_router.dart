@@ -40,7 +40,7 @@ class AppRouter {
 
   late final GoRouter router = GoRouter(
     initialLocation: '/splash',
-    debugLogDiagnostics: true,
+    debugLogDiagnostics: false,
     refreshListenable: GoRouterRefreshStream(authBloc.stream),
     navigatorKey: navigatorKey,
     redirect: (context, state) {

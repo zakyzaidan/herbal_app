@@ -30,8 +30,6 @@ class CategorySection extends StatelessWidget {
 
     if (categories.contains(selectedCategory)) {
       activeCategory = selectedCategory;
-      allCategories.remove(selectedCategory);
-      allCategories = [selectedCategory, ...allCategories];
     }
 
     // Hitung item per baris
