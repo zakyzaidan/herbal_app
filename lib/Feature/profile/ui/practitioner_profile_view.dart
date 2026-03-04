@@ -119,7 +119,7 @@ class _PractitionerProfileViewState extends State<PractitionerProfileView>
               IconButton(
                 icon: const Icon(Icons.settings_outlined, color: Colors.white),
                 onPressed: () {
-                  context.push('/settings');
+                  context.pushNamed('settings');
                 },
               ),
             ],

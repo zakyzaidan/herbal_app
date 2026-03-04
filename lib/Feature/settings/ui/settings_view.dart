@@ -251,10 +251,10 @@ class _SettingsViewState extends State<SettingsView> {
           TextButton(
             onPressed: () {
               context.read<AuthBloc>().add(AuthLogoutRequested());
+              context.goNamed('login');
               ScaffoldMessenger.of(
                 context,
               ).showSnackBar(const SnackBar(content: Text('Berhasil keluar')));
-              context.go('auth/login');
             },
             child: const Text('Keluar', style: TextStyle(color: Colors.red)),
           ),
@@ -539,7 +539,6 @@ class RoleSelectionBottomSheet extends StatelessWidget {
             title: 'Buat Akun Penjual',
             subtitle: 'Daftar sebagai penjual produk herbal',
             onTap: () {
-              ;
               context.goNamed('create-seller');
             },
           ),

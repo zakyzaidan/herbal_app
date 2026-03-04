@@ -107,7 +107,7 @@ class BasicProfileView extends StatelessWidget {
               IconButton(
                 icon: const Icon(Icons.settings_outlined, color: Colors.white),
                 onPressed: () {
-                  context.push('/settings');
+                  context.pushNamed('settings');
                 },
               ),
             ],

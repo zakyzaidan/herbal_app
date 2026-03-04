@@ -98,16 +98,6 @@ class AppRouter {
               );
             },
           ),
-          GoRoute(
-            path: '/create-seller',
-            name: 'create-seller',
-            builder: (context, state) => const SellerProfileFormScreen(),
-          ),
-          GoRoute(
-            path: '/create-practitioner',
-            name: 'create-practitioner',
-            builder: (context, state) => const PractitionerProfileFormScreen(),
-          ),
         ],
       ),
 
@@ -246,6 +236,28 @@ class AppRouter {
               GoRoute(
                 path: '/profile',
                 name: 'profile',
+                routes: [
+                  // ===== SETTINGS =====
+                  GoRoute(
+                    path: '/settings',
+                    name: 'settings',
+                    routes: [
+                      GoRoute(
+                        path: '/create-seller',
+                        name: 'create-seller',
+                        builder: (context, state) =>
+                            const SellerProfileFormScreen(),
+                      ),
+                      GoRoute(
+                        path: '/create-practitioner',
+                        name: 'create-practitioner',
+                        builder: (context, state) =>
+                            const PractitionerProfileFormScreen(),
+                      ),
+                    ],
+                    builder: (context, state) => const SettingsView(),
+                  ),
+                ],
                 pageBuilder: (context, state) =>
                     NoTransitionPage(child: const ProfilView()),
               ),
@@ -253,13 +265,6 @@ class AppRouter {
           ),
           // PROFILE
         ],
-      ),
-
-      // ===== SETTINGS =====
-      GoRoute(
-        path: '/settings',
-        name: 'settings',
-        builder: (context, state) => const SettingsView(),
       ),
     ],
     errorBuilder: (context, state) => Scaffold(
