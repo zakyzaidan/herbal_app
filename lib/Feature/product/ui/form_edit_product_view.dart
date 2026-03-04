@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:herbal_app/Feature/product/bloc/product_bloc.dart';
 import 'package:herbal_app/data/models/product_model.dart';
-import 'package:herbal_app/data/services/supabase_storage_services.dart';
+import 'package:herbal_app/data/supabase/supabase_storage_services.dart';
 import 'package:image_picker/image_picker.dart';
 
 class ProductEditFormScreen extends StatefulWidget {

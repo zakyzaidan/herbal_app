@@ -77,3 +77,14 @@ abstract final class AppTheme {
     cupertinoOverrideTheme: const CupertinoThemeData(applyThemeToAll: true),
   );
 }
+
+
+// ThemeData tema = ThemeData(
+//   colorScheme: ColorScheme.fromSeed(
+//     seedColor: const Color(0xAAF5F5F5),
+//     brightness: Brightness.light,
+//     primary: const Color(0xAA0A400C),
+//     secondary: const Color(0xAAB6CBBD),
+//     surface: const Color(0xAAFFFFFF),
+//   ),
+// );

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:herbal_app/Feature/authentication/bloc/auth_bloc.dart';
-import 'package:herbal_app/main.dart';
+import 'package:herbal_app/data/supabase/supabase_client.dart';
 
 class SellerProfileFormScreen extends StatefulWidget {
   const SellerProfileFormScreen({super.key});
@@ -399,34 +399,6 @@ class _SellerProfileFormScreenState extends State<SellerProfileFormScreen> {
                 ),
               ),
             ),
-            // const SizedBox(height: 24),
-            // SizedBox(
-            //   width: double.infinity,
-            //   child: ElevatedButton(
-            //     onPressed: () {
-            //       Navigator.of(context).pop(); // Close dialog
-            //       Navigator.push(
-            //   context,
-            //   MaterialPageRoute(builder: (context) => const MainNavigation()),
-            // ); // Close form
-            //     },
-            //     style: ElevatedButton.styleFrom(
-            //       backgroundColor: Colors.green[700],
-            //       shape: RoundedRectangleBorder(
-            //         borderRadius: BorderRadius.circular(12),
-            //       ),
-            //       padding: const EdgeInsets.symmetric(vertical: 14),
-            //     ),
-            //     child: const Text(
-            //       'OK',
-            //       style: TextStyle(
-            //         fontSize: 16,
-            //         fontWeight: FontWeight.bold,
-            //         color: Colors.white,
-            //       ),
-            //     ),
-            //   ),
-            // ),
           ],
         ),
       ),

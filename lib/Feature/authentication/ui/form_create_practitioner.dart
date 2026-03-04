@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:herbal_app/Feature/authentication/bloc/auth_bloc.dart';
-import 'package:herbal_app/data/services/supabase_storage_services.dart';
-import 'package:herbal_app/main.dart';
+import 'package:herbal_app/data/supabase/supabase_client.dart';
+import 'package:herbal_app/data/supabase/supabase_storage_services.dart';
 import 'package:image_picker/image_picker.dart';
 
 class PractitionerProfileFormScreen extends StatefulWidget {

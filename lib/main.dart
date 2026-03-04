@@ -17,8 +17,6 @@ void main() async {
   runApp(const MyApp());
 }
 
-final supabase = Supabase.instance.client;
-
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
@@ -42,13 +40,3 @@ class MyApp extends StatelessWidget {
     );
   }
 }
-
-ThemeData tema = ThemeData(
-  colorScheme: ColorScheme.fromSeed(
-    seedColor: const Color(0xAAF5F5F5),
-    brightness: Brightness.light,
-    primary: const Color(0xAA0A400C),
-    secondary: const Color(0xAAB6CBBD),
-    surface: const Color(0xAAFFFFFF),
-  ),
-);

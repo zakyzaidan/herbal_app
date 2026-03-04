@@ -2,8 +2,8 @@ import 'package:herbal_app/Feature/authentication/bloc/auth_bloc.dart';
 import 'package:herbal_app/data/models/product_cart_model.dart';
 import 'package:herbal_app/data/models/product_model.dart';
 import 'package:herbal_app/data/models/seller_model.dart';
-import 'package:herbal_app/data/services/supabase_storage_services.dart';
-import 'package:herbal_app/main.dart';
+import 'package:herbal_app/data/supabase/supabase_client.dart';
+import 'package:herbal_app/data/supabase/supabase_storage_services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' hide AuthState;
 

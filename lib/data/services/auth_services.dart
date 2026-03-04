@@ -6,7 +6,7 @@ import 'package:gotrue/src/types/auth_state.dart';
 import 'package:herbal_app/Feature/authentication/bloc/auth_bloc.dart'
     hide AuthState;
 import 'package:herbal_app/data/models/user_model.dart';
-import 'package:herbal_app/main.dart';
+import 'package:herbal_app/data/supabase/supabase_client.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' hide AuthState;
 
 class AuthServices {

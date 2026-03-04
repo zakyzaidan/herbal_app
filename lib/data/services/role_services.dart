@@ -3,7 +3,7 @@
 // ============================================================================
 
 import 'package:herbal_app/data/models/user_model.dart';
-import 'package:herbal_app/main.dart';
+import 'package:herbal_app/data/supabase/supabase_client.dart';
 
 class RoleService {
   String? get _userId => supabase.auth.currentUser?.id;

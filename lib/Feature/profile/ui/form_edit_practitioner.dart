@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:herbal_app/data/models/practitioner_model.dart';
 import 'package:herbal_app/data/services/practitioner_services.dart';
-import 'package:herbal_app/data/services/supabase_storage_services.dart';
+import 'package:herbal_app/data/supabase/supabase_storage_services.dart';
 import 'package:image_picker/image_picker.dart';
 
 class PractitionerEditFormScreen extends StatefulWidget {

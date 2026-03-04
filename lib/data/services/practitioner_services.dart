@@ -1,7 +1,7 @@
 // lib/data/services/practitioner_services.dart
 
 import 'package:herbal_app/data/models/practitioner_model.dart';
-import 'package:herbal_app/main.dart';
+import 'package:herbal_app/data/supabase/supabase_client.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class PractitionerServices {
